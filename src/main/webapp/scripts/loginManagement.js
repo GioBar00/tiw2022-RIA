@@ -7,7 +7,7 @@
     document.getElementById("loginBtn").addEventListener("click", function (e) {
         const form = e.target.closest("form");
         if (form.checkValidity()) {
-            makeCall("POST", 'Login', function (response) {
+            makeCall("POST", 'login', function (response) {
                 if (response.readyState === XMLHttpRequest.DONE) {
                     const message = response.responseText;
                     switch (response.status) {
@@ -23,6 +23,7 @@
                             break;
                         default:
                             alert(message);
+                            break;
                     }
                 }
             }, form);

@@ -4,8 +4,11 @@ import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
+import org.apache.commons.lang.StringEscapeUtils;
+
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +21,8 @@ import java.sql.SQLException;
 /**
  * This class is the controller for the login page.
  */
-@WebServlet(name = "Login", value = "/login")
+@WebServlet("/login")
+@MultipartConfig
 public class Login extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -54,8 +58,8 @@ public class Login extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String identifier = req.getParameter("username");
-        String password = req.getParameter("password");
+        String identifier =  StringEscapeUtils.escapeJava(req.getParameter("username"));
+        String password = StringEscapeUtils.escapeJava(req.getParameter("password"));
 
         if (identifier == null || identifier.isEmpty() || password == null || password.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);

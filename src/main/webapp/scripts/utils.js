@@ -21,3 +21,14 @@ function makeCall(method, url, callBack, formElement, reset = true) {
         formElement.reset();
     }
 }
+
+/**
+ * This method check if an email is valid.
+ * @param email the email we want to check.
+ * @returns {*} true if the email is valid, false otherwise.
+ */
+function checkEmail(email) {
+    return email.match(
+        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+}
