@@ -2,8 +2,8 @@
     document.getElementById("sendSubmit").addEventListener("click", function (e) {
         const form = e.target.closest("form");
         if(form.checkValidity()){
-            if(document.getElementById("password") === document.getElementById("confirmPassword")) {
-                if (checkEmail(document.getElementById("email"))) {
+            if(document.getElementById("password").textContent === document.getElementById("confirmPassword").textContent) {
+                if (checkEmail(document.getElementById("email").textContent)) {
                     makeCall("POST", 'register',function (response){
                         if(response.readyState === 4){
                             const message = response.responseText;

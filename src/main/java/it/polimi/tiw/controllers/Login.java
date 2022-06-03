@@ -21,7 +21,7 @@ import java.sql.SQLException;
 /**
  * This class is the controller for the login page.
  */
-@WebServlet("/login")
+@WebServlet("/CheckLogin")
 @MultipartConfig
 public class Login extends HttpServlet {
     @Serial
