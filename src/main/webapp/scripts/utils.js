@@ -17,8 +17,21 @@ function makeCall(method, url, callBack, formElement, reset = true) {
     } else {
         request.send();
     }
-    if (formElement !== null && reset) {
+    if (formElement != null && reset) {
         formElement.reset();
+    }
+}
+
+function sendFormData(method, url, callBack, formData) {
+    const request = new XMLHttpRequest();
+    request.onreadystatechange = function () {
+        callBack(request);
+    };
+    request.open(method, url);
+    if (formData != null) {
+        request.send(formData);
+    } else {
+        request.send();
     }
 }
 

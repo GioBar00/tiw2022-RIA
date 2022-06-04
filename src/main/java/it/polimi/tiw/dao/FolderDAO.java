@@ -3,11 +3,8 @@ package it.polimi.tiw.dao;
 import it.polimi.tiw.beans.Folder;
 import it.polimi.tiw.beans.SubFolder;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.sql.Date;
+import java.sql.*;
 import java.util.*;
 
 /**
@@ -150,8 +147,8 @@ public class FolderDAO {
      * @param name the name of the folder.
      * @return if the name is valid.
      */
-    public static boolean isNameValid(String name) {
-        return name.matches("^([\\w()\\[\\]\\-.]+\\.?)*[\\w()\\[\\]\\-]+$") &&
+    public static boolean checkName(String name) {
+        return name != null && name.matches("^([\\w()\\[\\]\\-.]+\\.?)*[\\w()\\[\\]\\-]+$") && name.length() > 0 &&
                 name.length() <= 50;
     }
 }

@@ -3,8 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
+    <script src="scripts/utils.js" charset="utf-8"></script>
     <script src="scripts/homeManagement.js" charset="utf-8" defer></script>
 </head>
 <body>
+
+<div id="folderList">
+</div>
+
+
+<div id="documentDetails">
+    <p id="documentName"></p>
+    <p id="documentOwner"></p>
+    <p id="documentDate"></p>
+    <p id="documentFormat"></p>
+    <p id="documentSummary"></p>
+    <input type="button" id="hideDetails" value="Hide Details">
+</div>
+
+<div>
+    <form id="createFolder" action="#">
+        Create a Folder<br>
+        Folder Name: <input type="text" name="folderName" required> <br>
+        <input type="submit" id="createFld" value="Create Folder">
+    </form>
+</div>
+
+<div>
+    <form id="createSubFolder" action="#">
+        Create a SubFolder<br>
+        Sub Folder Name: <input type="text" name="subFolderName" required> <br>
+        <input type="button" id="createSubFld" value="Create SubFolder">
+    </form>
+</div>
+
+<div>
+    <form id="createDocument" action="#">
+        Create a Document<br>
+        Name:    <input type="text" name="docName"><br>
+        Format:  <input type="text" name="docFormat"><br>
+        Summary: <input type="text" name="docSummary"><br>
+        <input type="button" id="createDoc" value="Create Document">
+    </form>
+</div>
 </body>
 </html>
