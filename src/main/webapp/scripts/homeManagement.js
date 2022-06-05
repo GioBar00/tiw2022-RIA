@@ -54,6 +54,8 @@
             for (let i = 0; i < editButtons.length; i++) {
                 editButtons[i].style.visibility = "visible";
             }
+
+            dragAndDropManager.setupDragAndDrop();
         }
 
         this.undo = function () {
@@ -73,6 +75,8 @@
             for (let i = 0; i < editButtons.length; i++) {
                 editButtons[i].style.visibility = "hidden";
             }
+
+            dragAndDropManager.resetDragAndDrop();
         }
 
         this.showContent = function (view) {
@@ -98,14 +102,14 @@
                 let folderElement = document.createElement("li");
                 folderElement.id = "folder";
                 folderElement.textContent = folder.folder.name;
+                folderElement.setAttribute("folderId", folder.folder.id);
 
                 //create new subfolder button
                 let button = document.createElement("button");
                 button.className = "mngBtn";
                 button.textContent = "Create SubFolder";
-                button.setAttribute("folderId", folder.folder.id);
                 button.addEventListener("click", function (e) {
-                    createSubFolder.enableForm(e.target.getAttribute("folderId"));
+                    createSubFolder.enableForm(e.target.closest("li").getAttribute("folderId"));
                 });
                 folderElement.appendChild(button);
 
@@ -145,9 +149,6 @@
                                     documentDetails.showDocument(e.target.closest("li").getAttribute("documentId"));
                                 });
 
-                                //set draggable attributes
-                                dragAndDropManager.setDrag(documentElement);
-
                                 documentElement.appendChild(showDetails);
                                 documents.appendChild(documentElement);
                             });
@@ -160,21 +161,71 @@
             });
             let trashCan = document.createElement("li");
             trashCan.textContent = "TrashCan";
-            trashCan.className = "droppable";
+            trashCan.id = "trashCan";
             this.containter.appendChild(trashCan);
             this.undo();
         }
     }
 
     function DragAndDropManager() {
-        this.setDrag = function (element) {
-            let self = this;
-            element.addEventListener("dragstart", function (e) {
-                self.setDrop(element);
-            });
+        this.setupDragAndDrop = function () {
+            let elements = document.querySelectorAll("#document");
+            for(let element of elements){
+                this.setMove(element);
+            }
+            elements = document.querySelectorAll("#subfolder");
+            for(let element of elements){
+                this.setDelete(element);
+            }
+            elements = document.querySelectorAll("#folder");
+            for(let element of elements){
+                this.setDelete(element);
+            }
         }
 
-       this.setDrop = function(startElement) {
+        this.resetDragAndDrop = function (){
+            let elements = document.getElementsByClassName("draggable");
+            for(let element of elements){
+                element.removeEventListener("dragover", onDragOver);
+                element.removeEventListener("dragleave", onDragLeave);
+                element.removeEventListener("drop", onMove);
+            }
+            let list = document.querySelectorAll("#subfolder");
+            for(let element of list){
+                element.removeEventListener("dragstart",setDeleteDrag);
+            }
+            list = document.querySelectorAll("#folder");
+            for(let element of list){
+                element.removeEventListener("dragstart",setDeleteDrag);
+            }
+            list = document.querySelectorAll("#document");
+            for(let element of list){
+                element.removeEventListener("dragstart",setDocumentDrag);
+            }
+
+            let trashCan = document.getElementById("trashCan");
+            trashCan.removeEventListener("dragover", onDragOver);
+            trashCan.removeEventListener("dragleave", onDragLeave);
+            trashCan.removeEventListener("drop", onDelete);
+        }
+
+        this.setMove = function (element) {
+            element.addEventListener("dragstart", setDocumentDrag);
+        }
+
+        this.setDelete = function (element) {
+            element.addEventListener("dragstart", setDeleteDrag);
+        }
+        this.setTrashCan = function () {
+            let trashCan = document.getElementById("trashCan");
+            trashCan.addEventListener("dragover",onDragOver );
+
+            trashCan.addEventListener("dragleave", onDragLeave);
+
+            trashCan.addEventListener("drop", onDelete);
+        }
+
+        this.setDocumentDrop = function (startElement) {
             let elements = document.getElementsByClassName("droppable");
             let notDroppable;
             let find = false;
@@ -190,45 +241,93 @@
                 if (element === notDroppable) {
                     element.style.backgroundColor = "red";
                 } else {
-                    element.addEventListener("dragover", function (e) {
-                        e.preventDefault();
-                        element.className = "selected";
-                    });
+                    element.addEventListener("dragover", onDragOver);
 
-                    element.addEventListener("dragleave", function (e) {
-                        element.className = "notSelected";
-                    });
+                    element.addEventListener("dragleave", onDragLeave);
 
-                    element.addEventListener("drop", function (e) {
-                        notDroppable.style.backgroundColor = "default";
-
-                        let subFolderId = e.target.closest("li").getAttribute("subfolderId");
-                        let formData = new FormData();
-                        formData.append("subFolderId", subFolderId);
-                        formData.append("documentId", startElement.getAttribute("documentId"));
-                        sendFormData("POST", 'move-document', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                let text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        pageOrchestrator.refresh();
-                                        break;
-                                    case 400:
-                                        alert(text);
-                                        break;
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                }
-                            }
-                        }, formData);
-                    });
+                    element.addEventListener("drop", onMove);
                 }
+            }
+        }
 
+        function setDocumentDrag(e, element, self){
+            self.setDocumentDrop(element);
+        }
+
+        function setDeleteDrag(e, element, self){
+            self.setTrashCan();
+        }
+
+        function onDragOver(e, element) {
+            e.preventDefault();
+            element.className = "selected";
+        }
+
+        function onDragLeave(e, element) {
+            element.className = "notSelected";
+        }
+
+        function onMove(e, notDroppable ,self){
+            notDroppable.style.backgroundColor = "notSelected";
+            self.resetDroppable();
+            let subFolderId = e.target.closest("li").getAttribute("subfolderId");
+            let formData = new FormData();
+            formData.append("subFolderId", subFolderId);
+            formData.append("documentId", startElement.getAttribute("documentId"));
+            sendFormData("POST", 'move-document', function (response) {
+                if (response.readyState === XMLHttpRequest.DONE) {
+                    let text = response.responseText;
+                    switch (response.status) {
+                        case 200:
+                            pageOrchestrator.refresh();
+                            break;
+                        case 400:
+                            alert(text);
+                            break;
+                        case 500:
+                            alert(text);
+                            break;
+                        default:
+                            alert("Unknown error");
+                    }
+                }
+            }, formData);
+
+        }
+
+        function onDelete(e, trashCan , self) {
+            trashCan.className = "notSelected";
+            let element = e.target.closest("li");
+            let id;
+            switch (element.id) {
+                case "folder":
+                    id = element.getAttribute("folderId");
+                    break;
+                case "subFolder":
+                    id = element.getAttribute("subfolderId");
+                    break;
+                case "document":
+                    id = element.getAttribute("documentId");
+                    break;
+            }
+            if (confirm("Are you sure you want to delete this item?")) {
+                //todo call to delete;
+            } else {
+                self.resetDroppable();
+            }
+        }
+
+        this.resetDroppable = function () {
+            let elements = document.getElementsByClassName("selected");
+            for (const element of elements) {
+                element.className = "droppable";
+            }
+            elements = document.getElementsByClassName("notSelected");
+            for (const element of elements) {
+                element.className = "droppable";
             }
 
+            document.getElementById("trashCan").className = "";
         }
 
     }
