@@ -11,7 +11,8 @@ public abstract class InputValidator {
      */
     public static boolean isInt(String toCheck, HttpServletResponse response) throws IOException {
         if(!toCheck.matches("-?\\d+")){
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().write("Invalid input");
             return false;
         }
         return true;
