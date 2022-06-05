@@ -106,10 +106,12 @@ public class FolderDAO {
                             resultSet.getDate("f.creationDate"), resultSet.getInt("user_iduser"));
                     folders.put(folder, new LinkedList<>());
                 }
-                SubFolder subFolder = new SubFolder(resultSet.getInt("idsubfolder"), resultSet.getString("s.name"),
-                        resultSet.getDate("s.creationDate"),
-                        resultSet.getInt("folder_idfolder"));
-                folders.get(folder).add(subFolder);
+                if (resultSet.getString("s.name") != null) {
+                    SubFolder subFolder = new SubFolder(resultSet.getInt("idsubfolder"), resultSet.getString("s.name"),
+                            resultSet.getDate("s.creationDate"),
+                            resultSet.getInt("folder_idfolder"));
+                    folders.get(folder).add(subFolder);
+                }
             }
             return folders;
         }
