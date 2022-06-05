@@ -3,8 +3,11 @@ package it.polimi.tiw.dao;
 import it.polimi.tiw.beans.Folder;
 import it.polimi.tiw.beans.SubFolder;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Date;
-import java.sql.*;
 import java.util.*;
 
 /**
@@ -104,7 +107,7 @@ public class FolderDAO {
                     folders.put(folder, new LinkedList<>());
                 }
                 SubFolder subFolder = new SubFolder(resultSet.getInt("idsubfolder"), resultSet.getString("s.name"),
-                        resultSet.getDate("creationDate"),
+                        resultSet.getDate("s.creationDate"),
                         resultSet.getInt("folder_idfolder"));
                 folders.get(folder).add(subFolder);
             }
@@ -126,6 +129,21 @@ public class FolderDAO {
             statement.setString(1, name);
             statement.setDate(2, new Date(new java.util.Date().getTime()));
             statement.setInt(3, ownerId);
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * This method deletes the {@link Folder} with the given id.
+     *
+     * @param id the id of the folder.
+     * @return if the folder was deleted.
+     * @throws SQLException if an error occurs during the query.
+     */
+    public boolean deleteFolder(int id) throws SQLException {
+        String query = "DELETE FROM folder WHERE idfolder = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, id);
             return statement.executeUpdate() > 0;
         }
     }

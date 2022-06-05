@@ -1,9 +1,12 @@
 package it.polimi.tiw.dao;
 
 import it.polimi.tiw.beans.Document;
+import it.polimi.tiw.beans.SubFolder;
+import it.polimi.tiw.beans.User;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is the Data Access Object for the SubFolder.
@@ -26,15 +29,29 @@ public class SubFolderDAO {
 
     /**
      * This method checks if the name could be valid
+     *
      * @return true the name could be valid, false otherwise
      */
-    public boolean checkName(String name){
-        return (name != null && name.length() > 0 && name.length() <= 50);
+    public static boolean checkName(String name) {
+        return name != null && name.length() > 0 &&
+                name.length() <= 50;
     }
 
-    public boolean doesSubFolderExist(int folderId, String subFolderName) {
-        //TODO
-        return false;
+    /**
+     * This method checks if a subfolder with a given name already exists inside a folder
+     *
+     * @param folderId      the id of the folder
+     * @param subFolderName the name of the subfolder
+     * @return true if the subfolder already exists, false otherwise
+     */
+    public boolean doesSubFolderExist(int folderId, String subFolderName) throws SQLException {
+        String query = "SELECT * FROM subfolder WHERE name = ? AND folder_idfolder = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, subFolderName);
+            statement.setInt(2, folderId);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        }
     }
 
     /**
@@ -62,28 +79,24 @@ public class SubFolderDAO {
      * This method returns all {@link Document}(s) in a specified subFolder.
      *
      * @param subFolderId the id of the subFolder.
-     * @return {@link ArrayList} of {@link Document}.
+     * @return {@link List} of {@link Document}.
      * @throws SQLException if an error occurs during the query.
      */
-    public ArrayList<Document> getDocuments(int subFolderId) throws SQLException {
-        String query = "SELECT d.iddocument FROM document d INNER JOIN subfolder s ON d.subfolder_idsubfolder = s.idsubfolder WHERE s.idsubfolder = ?";
+    public List<Document> getDocuments(int subFolderId) throws SQLException {
+        String query = "SELECT * FROM document WHERE subfolder_idsubfolder = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, subFolderId);
             ResultSet resultSet = statement.executeQuery();
 
-            if (!resultSet.isBeforeFirst())
-                return null;
-
-            ArrayList<Document> documents = new ArrayList<>();
-            Document document;
-            int documentId;
+            List<Document> documents = new ArrayList<>();
             while (resultSet.next()) {
-                documentId = resultSet.getInt("iddocument");
-                //todo show this
-                DocumentDAO documentDAO = new DocumentDAO(this.connection);
-                document = documentDAO.getDocument(documentId);
-                if (document != null)
-                    documents.add(document);
+                Document document = new Document(resultSet.getInt("iddocument"),
+                        resultSet.getString("name"),
+                        resultSet.getString("format"),
+                        resultSet.getString("summary"),
+                        resultSet.getDate("creationDate"),
+                        subFolderId);
+                documents.add(document);
             }
             return documents;
         }
@@ -109,4 +122,41 @@ public class SubFolderDAO {
         }
     }
 
+    /**
+     * This method delete a {@link SubFolder} from the database.
+     *
+     * @param subFolderId the id of the {@link SubFolder} to delete.
+     * @return true if the {@link SubFolder} has been deleted, false otherwise.
+     * @throws SQLException if an error occurs during the query.
+     */
+    public boolean deleteSubFolder(int subFolderId) throws SQLException {
+        String query = "DELETE FROM subfolder WHERE idsubfolder = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, subFolderId);
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * This method gets the {@link SubFolder} with the specified id.
+     *
+     * @param subFolderId the id of the subFolder.
+     * @return the {@link SubFolder} with the specified id.
+     * @throws SQLException if an error occurs during the query.
+     */
+    public SubFolder getSubFolder(int subFolderId) throws SQLException {
+        String query = "SELECT * FROM subfolder WHERE idsubfolder = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, subFolderId);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                return new SubFolder(resultSet.getInt("idsubfolder"),
+                        resultSet.getString("name"),
+                        resultSet.getDate("creationDate"),
+                        resultSet.getInt("folder_idfolder"));
+            }
+        }
+        return null;
+    }
 }

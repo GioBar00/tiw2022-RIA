@@ -11,6 +11,6 @@ import java.sql.Date;
  * @param creationDate the creation date of the document.
  * @param subFolderId the id of the subfolder of the document.
  */
-public record Document(int id, String name, String owner, String format, String summary, Date creationDate, int subFolderId) {
+public record Document(int id, String name, String format, String summary, Date creationDate, int subFolderId) {
 
 }

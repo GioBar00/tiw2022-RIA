@@ -29,7 +29,7 @@ public class DocumentDAO {
      *
      * @return true the name could be valid, false otherwise
      */
-    public boolean checkName(String name) {
+    public static boolean checkName(String name) {
         return (name != null && name.length() > 0 && name.length() <= 50);
     }
 
@@ -38,7 +38,7 @@ public class DocumentDAO {
      *
      * @return true the format is valid, false otherwise
      */
-    public boolean checkFormat(String format) {
+    public static boolean checkFormat(String format) {
         return (format != null && format.length() > 0 && format.length() <= 10);
     }
 
@@ -47,13 +47,24 @@ public class DocumentDAO {
      *
      * @return true the summary is valid, false otherwise
      */
-    public boolean checkSummary(String summary) {
+    public static boolean checkSummary(String summary) {
         return (summary != null && summary.length() > 0 && summary.length() <= 200);
     }
 
-    public boolean doesDocumentExists() {
-        //TODO
-        return false;
+    /**
+     * This method checks if a document with the same name already exists
+     *
+     * @return true if the document already exists, false otherwise
+     */
+    public boolean doesDocumentExists(int subFolderId, String name, String format) throws SQLException {
+        String query = "SELECT * FROM document WHERE subfolder_idsubfolder = ? AND name = ? AND format = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, subFolderId);
+            statement.setString(2, name);
+            statement.setString(3, format);
+            ResultSet resultSet = statement.executeQuery();
+            return resultSet.next();
+        }
     }
 
     /**
@@ -67,12 +78,10 @@ public class DocumentDAO {
     public boolean checkOwner(int userId, int documentId) throws SQLException {
         String query = "SELECT user_iduser FROM (document d INNER JOIN subfolder s ON d.subfolder_idsubfolder = s.idsubfolder) INNER JOIN folder f ON s.folder_idfolder = f.idfolder WHERE iddocument = ? AND user_iduser = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, String.valueOf(documentId));
+            statement.setInt(1, documentId);
             statement.setString(2, String.valueOf(userId));
             ResultSet resultSet = statement.executeQuery();
-
             return resultSet.next();
-
         }
     }
 
@@ -94,7 +103,6 @@ public class DocumentDAO {
             resultSet.next();
             return new Document(resultSet.getInt("iddocument"),
                     resultSet.getString("name"),
-                    findOwner(documentId),
                     resultSet.getString("format"),
                     resultSet.getString("summary"),
                     resultSet.getDate("creationDate"),
@@ -102,49 +110,6 @@ public class DocumentDAO {
             );
         }
     }
-
-    /**
-     * This method returns the owner of a document
-     * @param documentId the id of the document.
-     * @return the username of the owner
-     * @throws SQLException if an error occurs during the query
-     */
-    private String findOwner(int documentId) throws SQLException {
-        String query = "SELECT u.username FROM ((document d INNER JOIN subfolder s ON d.subfolder_idsubfolder = s.idsubfolder) INNER JOIN folder f ON s.folder_idfolder = f.idfolder) INNER JOIN user u ON f.user_iduser = u.iduser WHERE iddocument = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, documentId);
-            ResultSet resultSet = statement.executeQuery();
-
-            resultSet.next();
-            return resultSet.getString("username");
-
-        }
-
-    }
-
-    /**
-     * This method returns the {@link SubFolder} that contains the specified document.
-     *
-     * @param documentId the id of the document.
-     * @return {@link SubFolder}.
-     * @throws SQLException if an error occurs during the query.
-     */
-    public SubFolder getSubFolder(String documentId) throws SQLException {
-        String query = "SELECT * FROM  (subfolder s LEFT JOIN document d ON d.subfolder_idsubfolder = s.idsubfolder)WHERE iddocument = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, Integer.parseInt(documentId));
-            ResultSet resultSet = statement.executeQuery();
-
-            if (!resultSet.isBeforeFirst())
-                return null;
-            resultSet.next();
-            return new SubFolder(resultSet.getInt("idsubfolder"),
-                    resultSet.getString("name"),
-                    resultSet.getDate("creationDate"),
-                    resultSet.getInt("folder_idfolder"));
-        }
-    }
-
 
     /**
      * This method moves a {@link Document} to a specified {@link SubFolder}.
@@ -181,6 +146,21 @@ public class DocumentDAO {
             statement.setDate(4, new Date(new java.util.Date().getTime()));
             statement.setInt(5, subFolderId);
 
+            return statement.executeUpdate() > 0;
+        }
+    }
+
+    /**
+     * This method deletes a {@link Document}.
+     *
+     * @param documentId the id of the {@link Document}.
+     * @return true if the document has been deleted, false otherwise.
+     * @throws SQLException if an error occurs during the query.
+     */
+    public boolean deleteDocument(int documentId) throws SQLException {
+        String query = "DELETE FROM document WHERE iddocument = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, documentId);
             return statement.executeUpdate() > 0;
         }
     }

@@ -18,6 +18,7 @@ public class UserDAO {
 
     /**
      * Constructor.
+     *
      * @param connection the {@link Connection} to the database.
      */
     public UserDAO(Connection connection) {
@@ -26,6 +27,7 @@ public class UserDAO {
 
     /**
      * This method checks if the username and the password are correct and returns the {@link User} if they are.
+     *
      * @param username the username of the user.
      * @param password the password of the user.
      * @return the {@link User} if the username and the password are correct.
@@ -42,7 +44,8 @@ public class UserDAO {
 
     /**
      * This method checks if the email and the password are correct and returns the {@link User} if they are.
-     * @param email the email of the user.
+     *
+     * @param email    the email of the user.
      * @param password the password of the user.
      * @return the {@link User} if the email and the password are correct.
      * @throws SQLException if an error occurs during the query.
@@ -58,6 +61,7 @@ public class UserDAO {
 
     /**
      * This method returns the user if the credentials are correct otherwise it returns null.
+     *
      * @param statement the statement to execute.
      * @return the user if the credentials are correct otherwise it returns null.
      * @throws SQLException if an error occurs during the execution of the statement.
@@ -77,6 +81,7 @@ public class UserDAO {
 
     /**
      * This method returns if a user with the given username exists.
+     *
      * @param username the username of the user.
      * @return if a user with the given username exists.
      * @throws SQLException if an error occurs during the query.
@@ -93,6 +98,7 @@ public class UserDAO {
 
     /**
      * This method returns if a user with the given email exists.
+     *
      * @param email the email of the user.
      * @return if a user with the given email exists.
      * @throws SQLException if an error occurs during the query.
@@ -109,10 +115,11 @@ public class UserDAO {
 
     /**
      * This method inserts a new user in the database.
+     *
      * @param username the username of the user.
-     * @param email the email of the user.
-     * @param name the name of the user.
-     * @param surname the surname of the user.
+     * @param email    the email of the user.
+     * @param name     the name of the user.
+     * @param surname  the surname of the user.
      * @param password the password of the user.
      * @return the id of the user.
      * @throws SQLException if an error occurs during the query.
@@ -131,48 +138,52 @@ public class UserDAO {
 
     /**
      * This method checks if the username is valid.
+     *
      * @param username the username to check.
      * @return true if the username is valid, false otherwise.
      */
     public static boolean isValidUsername(String username) {
-        return username.matches("[a-zA-Z\\d]{3,20}$");
+        return username != null && username.matches("[a-zA-Z\\d]{3,20}$");
     }
 
     /**
      * This method checks if the email is valid.
+     *
      * @param email the email to check.
      * @return true if the email is valid, false otherwise.
      */
     public static boolean isValidEmail(String email) {
-        return email.matches("^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}])|(([a-zA-Z\\-\\d]+\\.)+[a-zA-Z]{2,}))$")
+        return email != null && email.matches("^(([^<>()\\[\\]\\\\.,;:\\s@\"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@\"]+)*)|(\".+\"))@((\\[\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}])|(([a-zA-Z\\-\\d]+\\.)+[a-zA-Z]{2,}))$")
                 && email.length() <= 50;
     }
 
     /**
      * This method checks if the password is valid.
+     *
      * @param password the password to check.
      * @return true if the password is valid, false otherwise.
      */
     public static boolean isValidPassword(String password) {
-        //return password.matches("^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&.])[A-Za-z\\d@$!%*#?&.]{8,}$" && password.length() <= 50;
-        return true;
+        return password.matches("^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d@$!%*#?&.]{8,}$") && password.length() <= 50;
     }
 
     /**
      * This method checks if the name is valid.
+     *
      * @param name the name to check.
      * @return true if the name is valid, false otherwise.
      */
     public static boolean isValidName(String name) {
-        return name.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
+        return name != null && name.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
     }
 
     /**
      * This method checks if the surname is valid.
+     *
      * @param surname the surname to check.
      * @return true if the surname is valid, false otherwise.
      */
     public static boolean isValidSurname(String surname) {
-        return surname.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
+        return surname != null && surname.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
     }
 }
