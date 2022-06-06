@@ -3,22 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>LoginPage</title>
+    <link rel="stylesheet" type="text/css" media="all" href="./css/style.css">
     <script src = "scripts/utils.js" charset="utf-8" defer></script>
     <script src = "scripts/loginManagement.js" charset="utf-8" defer></script>
 </head>
 <body>
-<h2>LoginForm</h2>
 
-    <fieldset>
-        <form action="#">
-        Username : <input type="text" name="username" required> <br>
-        Password : <input type="password" name="password" required> <br>
-        <input id="loginBtn" value="Login" type="button">
-        </form>
-        <p id="errorMsg"></p>
-    </fieldset>
+    <div class="header"> Login </div>
+    <div class="centered">
+        <fieldset>
+            <form action="#">
+                Username : <input type="text" name="username" required> <br>
+                Password : <input type="password" name="password" required> <br>
+                <input id="loginBtn" value="Login" type="submit">
+            </form>
+            <p id="errorMsg"></p>
+        </fieldset>
 
-<a href="register.html"> Go to subscription Form</a>
+        <a href="register.html" style="float: right"> Go to subscription Form</a>
+    </div>
+
 
 </body>
 </html>

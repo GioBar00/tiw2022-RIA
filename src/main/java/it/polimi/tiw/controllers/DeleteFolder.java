@@ -77,7 +77,7 @@ public class DeleteFolder extends HttpServlet {
             resp.getWriter().println("Folder is not valid");
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().println("Error while creating folder");
+            resp.getWriter().println("Error while deleting folder");
         }
     }
 

@@ -82,9 +82,11 @@ public class DocumentDetails extends HttpServlet {
             } else response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 
         } catch (NumberFormatException | NullPointerException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid document id");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Invalid document id");
         } catch (SQLException e) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while processing the request");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            response.getWriter().println("Error while processing the request");
         }
     }
 

@@ -60,43 +60,38 @@ public class GetFolders extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-       //String username =  StringEscapeUtils.escapeJava(req.getParameter("username"));
-       User user = (User) req.getSession().getAttribute("user");
-       String sessionUser = user.username();
-       if(sessionUser != null){
-           FolderDAO folderDAO = new FolderDAO(connection);
-           try {
-               if(folderDAO.getFoldersWithSubFolders(user.id()) != null){
-                   Map<Folder, List<SubFolder>> folders = folderDAO.getFoldersWithSubFolders(user.id());
-                   SubFolderDAO subFolderDAO = new SubFolderDAO(connection);
-                   ArrayList<FolderAndSubFolders> view = new ArrayList<>(folders.size());
+        //String username =  StringEscapeUtils.escapeJava(req.getParameter("username"));
+        User user = (User) req.getSession().getAttribute("user");
+        String sessionUser = user.username();
+        if (sessionUser != null) {
+            FolderDAO folderDAO = new FolderDAO(connection);
+            try {
+                Map<Folder, List<SubFolder>> folders = folderDAO.getFoldersWithSubFolders(user.id());
+                SubFolderDAO subFolderDAO = new SubFolderDAO(connection);
+                ArrayList<FolderAndSubFolders> view = new ArrayList<>(folders.size());
 
-                   for(Folder folder : folders.keySet()){
-                       List<SubFolderAndDocuments> subFolders = new ArrayList<>(folders.get(folder).size());
-                       for(SubFolder subFolder : folders.get(folder)){
-                           subFolders.add(new SubFolderAndDocuments(subFolder, subFolderDAO.getDocuments(subFolder.id())));
-                       }
-                       view.add(new FolderAndSubFolders(folder, subFolders));
-                   }
+                for (Folder folder : folders.keySet()) {
+                    List<SubFolderAndDocuments> subFolders = new ArrayList<>(folders.get(folder).size());
+                    for (SubFolder subFolder : folders.get(folder)) {
+                        subFolders.add(new SubFolderAndDocuments(subFolder, subFolderDAO.getDocuments(subFolder.id())));
+                    }
+                    view.add(new FolderAndSubFolders(folder, subFolders));
+                }
 
-                   Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
-                   String json = gson.toJson(view);
+                Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+                String json = gson.toJson(view);
 
-                   resp.setContentType("application/json");
-                   resp.setCharacterEncoding("UTF-8");
-                   resp.getWriter().write(json);
+                resp.setContentType("application/json");
+                resp.setCharacterEncoding("UTF-8");
+                resp.getWriter().write(json);
 
-               }else {
-                   resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-               }
-           } catch (SQLException e) {
-               resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-               resp.getWriter().println("Internal server error");
-           }
-       }
-       else {
-           resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-       }
+            } catch (SQLException e) {
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().println("Internal server error");
+            }
+        } else {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+        }
     }
 
     /**

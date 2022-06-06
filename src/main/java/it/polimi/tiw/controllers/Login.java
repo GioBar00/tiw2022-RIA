@@ -1,5 +1,7 @@
 package it.polimi.tiw.controllers;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
@@ -88,11 +90,14 @@ public class Login extends HttpServlet {
             return;
         }
 
+        Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+        String json = gson.toJson(user);
+
         req.getSession().setAttribute("user", user);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
-        resp.getWriter().println(user);
+        resp.getWriter().println(json);
     }
 
     /**
