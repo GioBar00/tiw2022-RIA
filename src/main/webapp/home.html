@@ -12,16 +12,15 @@
 <div class="header">
      Home Page
     <div id="userName" class="header-left"></div>
-    <div class="header-right">
+    <span class="header-right">
         <input id="Logout" type="button" value="Logout" style="float: right"> <input id="EditButton" type="button" style="float: left">
-    </div>
+    </span>
 </div>
 
-<div id="folderList">
+<div id="folderList" class = "left-div">
 </div>
 
-
-<div id="documentDetails">
+<div id="documentDetails" class = "right-div">
     <p id="documentName"></p>
     <p id="documentOwner"></p>
     <p id="documentDate"></p>
@@ -30,30 +29,33 @@
     <input type="button" id="hideDetails" value="Hide Details">
 </div>
 
-<div>
-    <form id="createFolder" action="#">
-        Create a Folder<br>
-        Folder Name: <input type="text" name="folderName" required> <br>
-        <input type="submit" id="createFld" value="Create Folder">
-    </form>
-</div>
+<footer class = "footer">
+    <div class = "left-form">
+        <form id="createFolder" action="#" class="creation-form">
+            Create a Folder<br>
+            Folder Name: <input type="text" name="folderName" required> <br>
+            <input type="submit" id="createFld" value="Create Folder">
+        </form>
+    </div>
 
-<div>
-    <form id="createSubFolder" action="#">
-        Create a SubFolder<br>
-        Sub Folder Name: <input type="text" name="subFolderName" required> <br>
-        <input type="button" id="createSubFld" value="Create SubFolder">
-    </form>
-</div>
+    <div class = "middle-form">
+        <form id="createSubFolder" action="#" class="creation-form">
+            Create a SubFolder<br>
+            Sub Folder Name: <input type="text" name="subFolderName" required> <br>
+            <input type="button" id="createSubFld" value="Create SubFolder">
+        </form>
+    </div>
 
-<div>
-    <form id="createDocument" action="#">
-        Create a Document<br>
-        Name:    <input type="text" name="docName"><br>
-        Format:  <input type="text" name="docFormat"><br>
-        Summary: <input type="text" name="docSummary"><br>
-        <input type="button" id="createDoc" value="Create Document">
-    </form>
-</div>
+    <div class="right-form">
+        <form id="createDocument" action="#" class="creation-form">
+            Create a Document<br>
+            Name:    <input type="text" name="docName"><br>
+            Format:  <input type="text" name="docFormat"><br>
+            Summary: <input type="text" name="docSummary"><br>
+            <input type="button" id="createDoc" value="Create Document">
+        </form>
+    </div>
+</footer>
+
 </body>
 </html>

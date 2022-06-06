@@ -459,7 +459,7 @@
                                 }
                             }
                         }
-                        , new FormData(form));
+                        ,form);
                 } else form.reportValidity();
             }, false);
         }

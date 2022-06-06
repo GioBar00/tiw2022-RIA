@@ -41,6 +41,51 @@ body {
     margin-block-start: 10px;
     margin-block-end: 10px;
 }
+
+.right-div {
+    width: 49%;
+    border: solid green;
+    border-radius: 4px;
+    float: right;
+}
+
+.left-div{
+    width: 50%;
+    border: solid green;
+    border-radius: 4px;
+    float: left;
+}
+
+.footer{
+    position: relative;
+    float : left;
+    width: 100%;
+    bottom : 0;
+}
+
+.left-form
+{
+    padding : 1%;
+    width: 30%;
+    float: left;
+}
+.middle-form
+{
+    padding : 1%;
+    width: 30%;
+    float: left;
+}
+.right-form {
+    padding : 1%;
+    width: 30%;
+    float: right;
+}
+
+.creation-form {
+    border: solid green;
+    border-radius: 4px;
+}
+
 input[type=text], input[type=password], input[type=email], form textarea {
     width: 100%;
     padding: 12px 20px;
