@@ -10,8 +10,19 @@
         } else {
             document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
             document.getElementById("Logout").addEventListener("click", function () {
-                sessionStorage.clear();
-                window.location.href = "login.html";
+                makeCall("GET", 'logout', function (response) {
+                    if (response.readyState === XMLHttpRequest.DONE) {
+                        switch (response.status) {
+                            case 200:
+                                sessionStorage.clear();
+                                window.location.href = "login.html";
+                                break;
+                            default :
+                                alert("Unknown Error");
+                                break;
+                        }
+
+                }});
             });
             pageOrchestrator.start();
             pageOrchestrator.refresh();

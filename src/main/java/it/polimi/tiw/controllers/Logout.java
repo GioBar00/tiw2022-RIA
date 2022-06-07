@@ -10,7 +10,7 @@ import java.io.Serial;
 /**
  * This class handles the logout of the user.
  */
-@WebServlet(name = "Logout", value = "/logout")
+@WebServlet("/logout")
 public class Logout extends HttpServlet {
     @Serial
     private static final long serialVersionUID = 1L;
