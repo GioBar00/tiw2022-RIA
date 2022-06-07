@@ -35,7 +35,8 @@
     <div class="left-form">
         <form id="createFolder" action="#" class="creation-form">
             Create a Folder<br>
-            Folder Name: <input type="text" name="folderName" required> <br>
+            <label for="folderName">Folder Name:</label>
+            <input type="text" id="folderName" name="folderName" required> <br>
             <input type="submit" id="createFld" value="Create Folder">
         </form>
     </div>
@@ -43,7 +44,8 @@
     <div class="middle-form">
         <form id="createSubFolder" action="#" class="creation-form">
             Create a SubFolder<br>
-            Sub Folder Name: <input type="text" name="subFolderName" required> <br>
+            <label for="subFolderName">SubFolder Name:</label>
+            <input type="text" id="subFolderName" name="subFolderName" required> <br>
             <input type="button" id="createSubFld" value="Create SubFolder">
         </form>
     </div>
@@ -51,9 +53,12 @@
     <div class="right-form">
         <form id="createDocument" action="#" class="creation-form">
             Create a Document<br>
-            Name: <input type="text" name="docName"><br>
-            Format: <input type="text" name="docFormat"><br>
-            Summary: <input type="text" name="docSummary"><br>
+            <label for="docName">Name:</label>
+            <input type="text" id="docName" name="docName"><br>
+            <label for="docFormat">Format:</label>
+            <input type="text" id="docFormat" name="docFormat"><br>
+            <label for="docSummary">Summary:</label>
+            <input type="text" id="docSummary" name="docSummary"><br>
             <input type="button" id="createDoc" value="Create Document">
         </form>
     </div>

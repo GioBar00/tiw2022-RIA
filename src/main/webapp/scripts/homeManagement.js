@@ -8,7 +8,7 @@
         if (sessionStorage.getItem("user") == null) {
             window.location.href = "login.html";
         } else {
-            document.getElementById("userName").textContent = escapeHtml(JSON.parse(sessionStorage.getItem("user")).username);
+            document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
             document.getElementById("Logout").addEventListener("click", function () {
                 document.getElementById("Logout").disable = true;
                 logout();
@@ -131,85 +131,100 @@
             let button = document.createElement("button");
             button.className = "mngBtn";
             button.textContent = "Create Folder";
-            button.addEventListener("click", function (e) {
+            button.addEventListener("click", function () {
                 createFolder.enableForm();
             });
             this.containter.appendChild(button);
 
+            let foldersUL = document.createElement("ul");
+
             //Building the list of folders.
             view.forEach((folderWithSub) => {
                 //Create the li element that contains the folder.
-                let folderElement = document.createElement("li");
-                folderElement.classList.add("folder");
-                folderElement.textContent = folderWithSub.folder.name;
-                folderElement.setAttribute("folderId", folderWithSub.folder.id);
+                let folderLi = document.createElement("li");
+                let folderDiv = document.createElement("div");
+                folderDiv.classList.add("folder");
+                folderDiv.textContent = folderWithSub.folder.name;
+                folderDiv.setAttribute("folderId", folderWithSub.folder.id);
+                //folderDiv.style.display = "inline";
 
                 //create new subfolder button.
                 let button = document.createElement("button");
                 button.className = "mngBtn";
                 button.textContent = "Create SubFolder";
-                button.addEventListener("click", function (e) {
+                button.addEventListener("click", function () {
                     createSubFolder.enableForm(folderWithSub.folder.id);
                 });
-                folderElement.appendChild(button);
+                folderLi.appendChild(folderDiv);
+                folderLi.appendChild(button);
 
                 //for each subfolder.
                 if (folderWithSub.subFolderAndDocumentsList != null && folderWithSub.subFolderAndDocumentsList.length > 0) {
                     //create a new ul element that contains the subfolders.
-                    let subFolders = document.createElement("ul");
+                    let subFolderUL = document.createElement("ul");
                     folderWithSub.subFolderAndDocumentsList.forEach((subFolderAndDocuments) => {
                         //create the li element that contains the subfolder.
-                        let subFolderElement = document.createElement("li");
-                        subFolderElement.classList.add("subfolder");
-                        subFolderElement.textContent = subFolderAndDocuments.subFolder.name;
-                        subFolderElement.setAttribute("subfolderId", subFolderAndDocuments.subFolder.id);
-                        subFolderElement.classList.add("droppable");
+                        let subFolderLi = document.createElement("li");
+                        let subFolderDiv = document.createElement("div");
+                        subFolderDiv.classList.add("subfolder");
+                        subFolderDiv.textContent = subFolderAndDocuments.subFolder.name;
+                        subFolderDiv.setAttribute("subfolderId", subFolderAndDocuments.subFolder.id);
+                        //subFolderDiv.style.display = "inline";
+                        subFolderLi.appendChild(subFolderDiv);
 
                         // create new document button
                         let button = document.createElement("button");
                         button.className = "mngBtn";
                         button.textContent = "Create Document";
-                        subFolderElement.appendChild(button);
-                        button.addEventListener("click", function (e) {
+                        subFolderLi.appendChild(button);
+                        button.addEventListener("click", function () {
                             createDocument.enableForm(subFolderAndDocuments.subFolder.id);
                         })
 
-                        subFolders.appendChild(subFolderElement);
+                        subFolderUL.appendChild(subFolderLi);
 
                         //for each document.
                         if (subFolderAndDocuments.documentList != null && subFolderAndDocuments.documentList.length > 0) {
                             //create a new ul element that contains the documents.
-                            let documents = document.createElement("ul");
+                            let documentUL = document.createElement("ul");
                             subFolderAndDocuments.documentList.forEach((doc) => {
                                 //create the li element that contains the document.
-                                let documentElement = document.createElement("li");
-                                documentElement.classList.add("document");
-                                documentElement.textContent = doc.name + "." + doc.format;
+                                let documentLi = document.createElement("li");
+                                let documentDiv = document.createElement("div");
+                                //docElement.style.display = "inline";
+                                documentDiv.classList.add("document");
+                                documentDiv.textContent = doc.name + "." + doc.format;
+                                documentDiv.setAttribute("documentId", doc.id);
+                                documentDiv.setAttribute("subfolderId", doc.subFolderId);
+                                documentLi.appendChild(documentDiv);
+
                                 let showDetails = document.createElement("button");
                                 showDetails.className = "ShowDetails";
                                 showDetails.textContent = "Show Details";
-                                documentElement.setAttribute("documentId", doc.id);
-                                documentElement.setAttribute("subfolderId", doc.subFolderId);
                                 //show details on click
-                                showDetails.addEventListener("click", function (e) {
+                                showDetails.addEventListener("click", function () {
                                     documentDetails.showDocument(doc.id);
                                 });
-                                documentElement.appendChild(showDetails);
-                                documents.appendChild(documentElement);
+                                documentLi.appendChild(showDetails);
+                                documentUL.appendChild(documentLi);
                             });
-                            subFolders.appendChild(documents);
+                            subFolderUL.appendChild(documentUL);
                         }
                     });
-                    folderElement.appendChild(subFolders);
+                    folderLi.appendChild(subFolderUL);
                 }
-                self.containter.appendChild(folderElement);
+                foldersUL.appendChild(folderLi);
             });
 
             //add the trashcan folder
-            let trashCan = document.createElement("li");
-            trashCan.textContent = "TrashCan";
-            trashCan.id = "trashCan";
-            this.containter.appendChild(trashCan);
+            let trashCanLi = document.createElement("li");
+            let trashCanDiv = document.createElement("div");
+            trashCanDiv.textContent = "TrashCan";
+            trashCanDiv.id = "trashCan";
+            trashCanLi.appendChild(trashCanDiv);
+            foldersUL.appendChild(trashCanLi);
+
+            self.containter.appendChild(foldersUL);
 
             //set the edit button to edit mode
             this.undo();
@@ -223,8 +238,7 @@
      * This class handles the drag and drop functionalities.
      */
     function DragAndDropManager() {
-        let notDroppable;
-        let startElement;
+        let self = this;
 
         /**
          * This method sets up the drag and drop functionality.
@@ -234,23 +248,24 @@
 
             //setting up the draggable elements and assigning them the dragstart event.
             for (let element of elements) {
-                this.setMove(element);
+                self.setMove(element);
                 element.setAttribute('draggable', "true");
             }
             elements = document.getElementsByClassName("subfolder");
             for (let element of elements) {
-                this.setDelete(element);
+                self.setDelete(element);
                 element.setAttribute('draggable', "true");
+
             }
             elements = document.getElementsByClassName("folder");
             for (let element of elements) {
-                this.setDelete(element);
+                self.setDelete(element);
                 element.setAttribute('draggable', "true");
             }
 
             //setting up the droppable elements and assigning them the dragover, dragleave and drop events.
-            this.setDocumentDrop();
-            this.setTrashCan();
+            self.setDocumentDrop();
+            self.setTrashCan();
         }
 
         /**
@@ -258,11 +273,23 @@
          * @param element the element we want to assign the dragstart event to.
          */
         this.setMove = function (element) {
-            let self = this;
             element.addEventListener("dragstart", function (e) {
-                self.startElement = e.target.closest("li");
-                self.findNotDroppable(self.startElement);
-                self.notDroppable.style.backgroundColor = "red";
+                e.target.classList.add("dragging");
+                self.startElement = e.target;
+                self.findNotDroppable(e.target);
+                self.notDroppable.classList.add("not-droppable");
+                let subFolders = document.getElementsByClassName("subfolder");
+                for (let subFolder of subFolders) {
+                    if (subFolder.getAttribute("subfolderId") !== self.notDroppable.getAttribute("subfolderId")) {
+                        subFolder.classList.add("droppable");
+                    }
+                }
+                let trashCan = document.getElementById("trashCan");
+                trashCan.classList.add("droppable");
+            });
+            element.addEventListener("dragend", function (e) {
+                e.target.classList.remove("dragging");
+                self.resetDroppable();
             });
         }
 
@@ -271,9 +298,15 @@
          * @param element the element we want to assign the dragstart event to.
          */
         this.setDelete = function (element) {
-            let self = this;
             element.addEventListener("dragstart", function (e) {
+                e.target.classList.add("dragging");
                 self.startElement = e.target;
+                let trashCan = document.getElementById("trashCan");
+                trashCan.classList.add("droppable");
+            });
+            element.addEventListener("dragend", function (e) {
+                e.target.classList.remove("dragging");
+                self.resetDroppable();
             });
         }
 
@@ -283,25 +316,25 @@
          */
         this.setTrashCan = function () {
             let trashCan = document.getElementById("trashCan");
-            let self = this;
             trashCan.addEventListener("dragover", function (e) {
                     e.preventDefault();
-                    trashCan.classList.add("selected");
+                    trashCan.classList.add("dragover");
                 }
             );
 
-            trashCan.addEventListener("dragleave", function (e) {
-                trashCan.classList.add("notSelected");
+            trashCan.addEventListener("dragleave", function () {
+                trashCan.classList.remove("dragover");
             });
 
-            trashCan.addEventListener("drop", function (e) {
-                trashCan.classList.add("notSelected");
+            trashCan.addEventListener("drop", function () {
                 if (confirm("Are you sure you want to delete this item?")) {
                     //request to delete the element.
                     //For the request we have to find the proper servlet.
                     //If the request is successful the folder list has to be refreshed.
                     if (self.startElement.classList.contains("document")) {
-                        makeCall("POST", 'delete-document?documentId=' + self.startElement.getAttribute("documentId"), function (response) {
+                        let formData = new FormData();
+                        formData.append("documentId", self.startElement.getAttribute("documentId"));
+                        sendFormData("POST", 'delete-document', function (response) {
                             if (response.readyState === XMLHttpRequest.DONE) {
                                 let text = response.responseText;
                                 switch (response.status) {
@@ -318,54 +351,49 @@
                                         alert("Unknown error");
                                 }
                             }
-                        });
-                    } else {
-                        if (self.startElement.classList.contains("subfolder")) {
-                            makeCall("POST", 'delete-subfolder?subfolderId=' + self.startElement.getAttribute("subfolderId"), function (response) {
-                                if (response.readyState === XMLHttpRequest.DONE) {
-                                    let text = response.responseText;
-                                    switch (response.status) {
-                                        case 200:
-                                            folderList.show();
-                                            break;
-                                        case 400:
-                                            alert(text);
-                                            break;
-                                        case 500:
-                                            alert(text);
-                                            break;
-                                        default:
-                                            alert("Unknown error");
-                                    }
+                        }, formData);
+                    } else if (self.startElement.classList.contains("subfolder")) {
+                        let formData = new FormData();
+                        formData.append("subfolderId", self.startElement.getAttribute("subfolderId"));
+                        sendFormData("POST", 'delete-subfolder', function (response) {
+                            if (response.readyState === XMLHttpRequest.DONE) {
+                                let text = response.responseText;
+                                switch (response.status) {
+                                    case 200:
+                                        folderList.show();
+                                        break;
+                                    case 400:
+                                    case 500:
+                                        alert(text);
+                                        break;
+                                    default:
+                                        alert("Unknown error");
                                 }
-
-                            });
-                        } else {
-                            if (self.startElement.classList.contains("folder")) {
-                                makeCall("POST", 'delete-folder?folderId=' + self.startElement.getAttribute("folderId"), function (response) {
-                                    if (response.readyState === XMLHttpRequest.DONE) {
-                                        let text = response.responseText;
-                                        switch (response.status) {
-                                            case 200:
-                                                folderList.show();
-                                                break;
-                                            case 400:
-                                                alert(text);
-                                                break;
-                                            case 500:
-                                                alert(text);
-                                                break;
-                                            default:
-                                                alert("Unknown error");
-                                        }
-                                    }
-
-                                });
                             }
-                        }
+                        }, formData);
+                    } else if (self.startElement.classList.contains("folder")) {
+                        let formData = new FormData();
+                        formData.append("folderId", self.startElement.getAttribute("folderId"));
+                        sendFormData("POST", 'delete-folder', function (response) {
+                            if (response.readyState === XMLHttpRequest.DONE) {
+                                let text = response.responseText;
+                                switch (response.status) {
+                                    case 200:
+                                        folderList.show();
+                                        break;
+                                    case 400:
+                                    case 500:
+                                        alert(text);
+                                        break;
+                                    default:
+                                        alert("Unknown error");
+                                }
+                            }
+
+                        }, formData);
                     }
                 }
-                self.resetDroppable(self);
+                self.resetDroppable();
             });
         }
 
@@ -374,12 +402,12 @@
          * @param startElement the document element who has been dragged.
          */
         this.findNotDroppable = function (startElement) {
-            let elements = document.getElementsByClassName("droppable");
+            let elements = document.getElementsByClassName("subfolder");
             let find = false;
 
             for (const element of elements) {
                 if (element.getAttribute("subfolderId") === startElement.getAttribute("subfolderId")) {
-                    this.notDroppable = element;
+                    self.notDroppable = element;
                     find = true;
                 }
             }
@@ -390,22 +418,23 @@
          * The droppable elements are the subfolders.
          */
         this.setDocumentDrop = function () {
-            let elements = document.getElementsByClassName("droppable");
-            let self = this;
+            let elements = document.getElementsByClassName("subfolder");
 
             for (const element of elements) {
                 element.addEventListener("dragover", function (e) {
+                    if (element.classList.contains("droppable")) {
                         e.preventDefault();
-                        element.classList.add("selected");
+                        element.classList.add("dragover");
                     }
-                );
+                });
 
-                element.addEventListener("dragleave", function (e) {
-                    element.classList.add("notSelected");
+                element.addEventListener("dragleave", function () {
+                    if (element.classList.contains("droppable")) {
+                        element.classList.remove("dragover");
+                    }
                 });
 
                 element.addEventListener("drop", function (e) {
-                    self.resetDroppable(self);
                     let subFolderId = e.target.getAttribute("subfolderId");
                     if (subFolderId !== self.startElement.getAttribute("subfolderId")) {
                         let formData = new FormData();
@@ -420,8 +449,6 @@
                                         pageOrchestrator.refresh();
                                         break;
                                     case 400:
-                                        alert(text);
-                                        break;
                                     case 500:
                                         alert(text);
                                         break;
@@ -431,6 +458,7 @@
                             }
                         }, formData);
                     }
+                    self.resetDroppable();
                 });
             }
         }
@@ -438,18 +466,18 @@
         /**
          * Reset the droppable elements and the notDroppable element.
          */
-        this.resetDroppable = function (self) {
-            self.notDroppable.style.backgroundColor = "white";
-
-            let elements = document.getElementsByClassName("selected");
-            for (const element of elements) {
-                element.classList.remove("selected");
-            }
-            elements = document.getElementsByClassName("notSelected");
-            for (const element of elements) {
-                element.classList.remove("notSelected");
+        this.resetDroppable = function () {
+            for (const elem of document.getElementsByClassName("not-droppable")) {
+                elem.classList.remove("not-droppable");
             }
 
+            let elements = document.getElementsByClassName("droppable");
+            for (const element of elements) {
+                element.classList.remove("droppable");
+            }
+
+            self.notDroppable = null;
+            self.startElement = null;
         }
 
     }

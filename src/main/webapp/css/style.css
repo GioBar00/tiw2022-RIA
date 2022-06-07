@@ -1,5 +1,4 @@
 
-
 body {
     font-family: Verdana, sans-serif;
     font-size: 15px;
@@ -49,34 +48,34 @@ body {
     float: right;
 }
 
-.left-div{
+.left-div {
     width: 50%;
     border: solid green;
     border-radius: 4px;
     float: left;
 }
 
-.footer{
+.footer {
     position: relative;
-    float : left;
+    float: left;
     width: 100%;
-    bottom : 0;
+    bottom: 0;
 }
 
-.left-form
-{
-    padding : 1%;
+.left-form {
+    padding: 1%;
     width: 30%;
     float: left;
 }
-.middle-form
-{
-    padding : 1%;
+
+.middle-form {
+    padding: 1%;
     width: 30%;
     float: left;
 }
+
 .right-form {
-    padding : 1%;
+    padding: 1%;
     width: 30%;
     float: right;
 }
@@ -104,12 +103,14 @@ input[type=submit], input[type=button] {
     cursor: pointer;
     width: 100%;
 }
+
 input[type = button] {
     background-color: #04AA6D;
     color: white;
     border: none;
     cursor: pointer;
 }
+
 input[type=submit]:hover, input[type=button]:hover {
     opacity: 0.8;
 }
@@ -130,9 +131,9 @@ ul {
 }
 
 div.centered {
-    margin-left:auto;
-    margin-right:auto;
-    width:50%;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
 }
 
 a, button {
@@ -156,10 +157,19 @@ ul div {
     display: inline;
 }
 
-.selected{
+.droppable {
+    color: green;
+    background-color: #ddd;
+}
+
+.droppable.dragover {
+    font-weight: bold;
+}
+
+.not-droppable {
     color: red;
 }
 
-.notSelected{
-    color: black;
+.dragging {
+    opacity: .5;
 }

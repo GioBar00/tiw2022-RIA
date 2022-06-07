@@ -1,7 +1,7 @@
 (function () {
-    document.getElementById("sendSubmit").addEventListener("click", function (e) {
-        document.getElementById("sendSubmit").disabled = true;
-        const form = e.target.closest("form");
+    const form = document.getElementById("registerForm");
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
         if (form.checkValidity()) {
             if (document.getElementById("password").textContent === document.getElementById("confirmPassword").textContent) {
                 if (checkEmail(document.getElementById("email").textContent)) {

@@ -4,8 +4,9 @@
  * After the request, analyzes the response and if it 's valid send a redirect to the home page.
  */
 (function () {
-    document.getElementById("loginBtn").addEventListener("click", function (e) {
-        const form = e.target.closest("form");
+    const form = document.getElementById("loginForm");
+    form.addEventListener("submit", function (e) {
+        e.preventDefault();
         if (form.checkValidity()) {
             makeCall("POST", 'CheckLogin', function (response) {
                 if (response.readyState === XMLHttpRequest.DONE) {
