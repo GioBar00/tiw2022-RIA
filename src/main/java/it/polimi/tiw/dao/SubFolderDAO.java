@@ -38,23 +38,6 @@ public class SubFolderDAO {
     }
 
     /**
-     * This method checks if a subfolder with a given name already exists inside a folder
-     *
-     * @param folderId      the id of the folder
-     * @param subFolderName the name of the subfolder
-     * @return true if the subfolder already exists, false otherwise
-     */
-    public boolean doesSubFolderExist(int folderId, String subFolderName) throws SQLException {
-        String query = "SELECT * FROM subfolder WHERE name = ? AND folder_idfolder = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setString(1, subFolderName);
-            statement.setInt(2, folderId);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        }
-    }
-
-    /**
      * This method checks if the user has the right on a subFolder.
      *
      * @param userId      the id of the user.

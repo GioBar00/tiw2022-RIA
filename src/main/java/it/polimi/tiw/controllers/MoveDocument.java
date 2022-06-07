@@ -58,7 +58,7 @@ public class MoveDocument extends HttpServlet {
 
         if (selectedSubFolder == null || documentId == null || selectedSubFolder.isEmpty() || documentId.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data is not correct");
+            response.getWriter().println("Not valid subfolder or document");
             return;
         }
 
@@ -66,24 +66,24 @@ public class MoveDocument extends HttpServlet {
         if (!InputValidator.isInt(selectedSubFolder, response) || !InputValidator.isInt(documentId, response))
             return;
 
+        int subFolderId = Integer.parseInt(selectedSubFolder);
+        int documentIdInt = Integer.parseInt(documentId);
+
         DocumentDAO documentDAO = new DocumentDAO(this.connection);
         SubFolderDAO subFolderDAO = new SubFolderDAO(this.connection);
         User user = (User) request.getSession().getAttribute("user");
 
         try {
-            if (subFolderDAO.checkOwner(user.id(), Integer.parseInt(selectedSubFolder))) {
-                Document document = documentDAO.getDocument(Integer.parseInt(documentId));
-                if (document != null) {
-                    int fromSubFolder = document.subFolderId();
-                    if (subFolderDAO.checkOwner(user.id(), fromSubFolder)) {
-                        if (documentDAO.moveDocument(document.id(), Integer.parseInt(selectedSubFolder))) {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            return;
-                        }
+            if (subFolderDAO.checkOwner(user.id(), subFolderId)) {
+                if (documentDAO.checkOwner(user.id(), documentIdInt)) {
+                    if (documentDAO.moveDocument(documentIdInt, subFolderId)) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        return;
                     }
                 }
             }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("Not valid subfolder or document");
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Error while processing the request");

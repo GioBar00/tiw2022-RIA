@@ -6,8 +6,6 @@ import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
-import org.apache.commons.lang.StringEscapeUtils;
-
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -48,7 +46,7 @@ public class Login extends HttpServlet {
     }
 
     /**
-     * Checks the credentials of the user and redirects to the home page if the credentials are correct.
+     * Checks the credentials of the user.
      *
      * @param req  an {@link HttpServletRequest} object that
      *             contains the request the client has made
@@ -60,8 +58,8 @@ public class Login extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String identifier =  StringEscapeUtils.escapeJava(req.getParameter("username"));
-        String password = StringEscapeUtils.escapeJava(req.getParameter("password"));
+        String identifier = req.getParameter("username");
+        String password = req.getParameter("password");
 
         if (identifier == null || identifier.isEmpty() || password == null || password.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -90,10 +88,10 @@ public class Login extends HttpServlet {
             return;
         }
 
+        req.getSession().setAttribute("user", user);
+
         Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
         String json = gson.toJson(user);
-
-        req.getSession().setAttribute("user", user);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");

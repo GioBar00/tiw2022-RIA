@@ -55,27 +55,26 @@ public class CreateSubFolder extends HttpServlet {
         String folderId = request.getParameter("folderId");
         String subFolder = request.getParameter("subFolderName");
 
-        if(folderId == null || folderId.isEmpty() || subFolder ==null || subFolder.isEmpty()){
+        if (folderId == null || folderId.isEmpty() || subFolder == null || subFolder.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data are not correct");
+            response.getWriter().println("The data is not correct");
             return;
         }
 
         if (!InputValidator.isInt(folderId, response))
             return;
+        int id = Integer.parseInt(folderId);
 
         FolderDAO folderDAO = new FolderDAO(this.connection);
         User user = (User) request.getSession().getAttribute("user");
         try {
-            if (folderDAO.doesFolderExist(Integer.parseInt(folderId), user.id())) {
+            if (folderDAO.checkOwner(id, user.id())) {
                 SubFolderDAO subFolderDAO = new SubFolderDAO(this.connection);
-                java.util.Date date = new java.util.Date();
-                long timeInMilliSeconds = date.getTime();
-                if (subFolderDAO.createSubFolder(subFolder, new Date(timeInMilliSeconds), Integer.parseInt(folderId))) {
+                if (subFolderDAO.createSubFolder(subFolder, new Date(new java.util.Date().getTime()), id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                 } else {
                     response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().println("The data are not correct");
+                    response.getWriter().println("The data is not correct");
                 }
             }
         } catch (SQLException e) {

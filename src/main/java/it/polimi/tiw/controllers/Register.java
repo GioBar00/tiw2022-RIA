@@ -3,7 +3,6 @@ package it.polimi.tiw.controllers;
 import it.polimi.tiw.dao.UserDAO;
 import it.polimi.tiw.enums.RegisterError;
 import it.polimi.tiw.utils.ConnectionHandler;
-import org.apache.commons.lang.StringEscapeUtils;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -55,12 +54,12 @@ public class Register extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String username = StringEscapeUtils.escapeJava(req.getParameter("username"));
-        String email = StringEscapeUtils.escapeJava(req.getParameter("email"));
-        String password = StringEscapeUtils.escapeJava(req.getParameter("password"));
-        String confirmPassword = StringEscapeUtils.escapeJava(req.getParameter("confirmPassword"));
-        String name = StringEscapeUtils.escapeJava(req.getParameter("name"));
-        String surname = StringEscapeUtils.escapeJava(req.getParameter("surname"));
+        String username = req.getParameter("username");
+        String email = req.getParameter("email");
+        String password = req.getParameter("password");
+        String confirmPassword = req.getParameter("confirmPassword");
+        String name = req.getParameter("name");
+        String surname = req.getParameter("surname");
 
         if (username == null || username.isEmpty() ||
                 email == null || email.isEmpty() ||
@@ -98,7 +97,10 @@ public class Register extends HttpServlet {
                 error = null;
 
             if (error != null) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                if (error == RegisterError.USERNAME_NOT_AVAILABLE || error == RegisterError.EMAIL_ALREADY_USED)
+                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                else
+                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println(error.getMessage());
                 return;
             }

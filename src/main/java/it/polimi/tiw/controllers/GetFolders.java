@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.polimi.tiw.beans.*;
 import it.polimi.tiw.dao.FolderDAO;
-import it.polimi.tiw.dao.SubFolderDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 import javax.servlet.ServletContext;
@@ -60,20 +59,19 @@ public class GetFolders extends HttpServlet {
      */
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        //String username =  StringEscapeUtils.escapeJava(req.getParameter("username"));
         User user = (User) req.getSession().getAttribute("user");
         String sessionUser = user.username();
         if (sessionUser != null) {
             FolderDAO folderDAO = new FolderDAO(connection);
             try {
-                Map<Folder, List<SubFolder>> folders = folderDAO.getFoldersWithSubFolders(user.id());
-                SubFolderDAO subFolderDAO = new SubFolderDAO(connection);
-                ArrayList<FolderAndSubFolders> view = new ArrayList<>(folders.size());
+                Map<Folder, Map<SubFolder, List<Document>>> folders = folderDAO.getFoldersWithSubFoldersAndDocuments(user.id());
+
+                List<FolderAndSubFolders> view = new ArrayList<>(folders.keySet().size());
 
                 for (Folder folder : folders.keySet()) {
-                    List<SubFolderAndDocuments> subFolders = new ArrayList<>(folders.get(folder).size());
-                    for (SubFolder subFolder : folders.get(folder)) {
-                        subFolders.add(new SubFolderAndDocuments(subFolder, subFolderDAO.getDocuments(subFolder.id())));
+                    List<SubFolderAndDocuments> subFolders = new ArrayList<>(folders.get(folder).keySet().size());
+                    for (SubFolder subFolder : folders.get(folder).keySet()) {
+                        subFolders.add(new SubFolderAndDocuments(subFolder, folders.get(folder).get(subFolder)));
                     }
                     view.add(new FolderAndSubFolders(folder, subFolders));
                 }

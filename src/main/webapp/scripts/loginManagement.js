@@ -13,9 +13,10 @@
                     switch (response.status) {
                         case 200:
                             sessionStorage.setItem("user", message);
-                            window.location.href = "home.html";
+                            window.location.href = "index.html";
                             break;
-                        case 400, 401:
+                        case 400:
+                        case 401:
                             document.getElementById("errorMsg").textContent = message;
                             break;
                         case 500:

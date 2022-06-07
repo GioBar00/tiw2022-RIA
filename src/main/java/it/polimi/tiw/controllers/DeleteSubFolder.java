@@ -3,6 +3,7 @@ package it.polimi.tiw.controllers;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.SubFolderDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
+import it.polimi.tiw.utils.InputValidator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -58,6 +59,8 @@ public class DeleteSubFolder extends HttpServlet {
                 resp.getWriter().println("Subfolder is not valid");
                 return;
             }
+            if (!InputValidator.isInt(idSubFolder, resp))
+                return;
             int id = Integer.parseInt(idSubFolder);
             User user = (User) req.getSession().getAttribute("user");
             SubFolderDAO subFolderDAO = new SubFolderDAO(connection);
@@ -69,15 +72,12 @@ public class DeleteSubFolder extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                 else {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    resp.getWriter().println("Error while creating folder");
+                    resp.getWriter().println("Error while deleting subfolder");
                 }
             }
-        } catch (NumberFormatException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Subfolder is not valid");
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().println("Error while deleting subFolder");
+            resp.getWriter().println("Error while deleting subfolder");
         }
     }
 

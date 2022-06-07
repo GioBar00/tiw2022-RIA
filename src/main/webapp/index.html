@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Document Manager</title>
+    <link rel="icon" type="image/x-icon" href="./images/favicon.png">
     <link rel="stylesheet" type="text/css" media="all" href="./css/style.css">
     <script src="scripts/utils.js" charset="utf-8"></script>
     <script src="scripts/homeManagement.js" charset="utf-8" defer></script>
@@ -10,17 +11,18 @@
 <body>
 
 <div class="header">
-     Home Page
+    <h1 style="display: inline">Document Manager</h1>
     <div id="userName" class="header-left"></div>
-    <span class="header-right">
-        <input id="Logout" type="button" value="Logout" style="float: right"> <input id="EditButton" type="button" style="float: left">
-    </span>
+    <div class="header-right">
+        <button id="Logout" type="button" style="float: right">Logout</button>
+        <button id="EditButton" type="button" style="float: left">Edit</button>
+    </div>
 </div>
 
-<div id="folderList" class = "left-div">
+<div id="folderList" class="left-div">
 </div>
 
-<div id="documentDetails" class = "right-div">
+<div id="documentDetails" class="right-div">
     <p id="documentName"></p>
     <p id="documentOwner"></p>
     <p id="documentDate"></p>
@@ -29,8 +31,8 @@
     <input type="button" id="hideDetails" value="Hide Details">
 </div>
 
-<footer class = "footer">
-    <div class = "left-form">
+<footer class="footer">
+    <div class="left-form">
         <form id="createFolder" action="#" class="creation-form">
             Create a Folder<br>
             Folder Name: <input type="text" name="folderName" required> <br>
@@ -38,7 +40,7 @@
         </form>
     </div>
 
-    <div class = "middle-form">
+    <div class="middle-form">
         <form id="createSubFolder" action="#" class="creation-form">
             Create a SubFolder<br>
             Sub Folder Name: <input type="text" name="subFolderName" required> <br>
@@ -49,8 +51,8 @@
     <div class="right-form">
         <form id="createDocument" action="#" class="creation-form">
             Create a Document<br>
-            Name:    <input type="text" name="docName"><br>
-            Format:  <input type="text" name="docFormat"><br>
+            Name: <input type="text" name="docName"><br>
+            Format: <input type="text" name="docFormat"><br>
             Summary: <input type="text" name="docSummary"><br>
             <input type="button" id="createDoc" value="Create Document">
         </form>

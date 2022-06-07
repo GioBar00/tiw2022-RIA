@@ -79,11 +79,11 @@ public class DocumentDetails extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
                 response.getWriter().write(json);
 
-            } else response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            } else {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                response.getWriter().println("The data is not correct");
+            }
 
-        } catch (NumberFormatException | NullPointerException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("Invalid document id");
         } catch (SQLException e) {
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Error while processing the request");

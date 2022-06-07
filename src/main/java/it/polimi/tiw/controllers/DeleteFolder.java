@@ -3,6 +3,7 @@ package it.polimi.tiw.controllers;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.FolderDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
+import it.polimi.tiw.utils.InputValidator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -58,10 +59,12 @@ public class DeleteFolder extends HttpServlet {
                 resp.getWriter().println("Folder is not valid");
                 return;
             }
+            if (!InputValidator.isInt(idFolder, resp))
+                return;
             int id = Integer.parseInt(idFolder);
             User user = (User) req.getSession().getAttribute("user");
             FolderDAO folderDAO = new FolderDAO(connection);
-            if (!folderDAO.doesFolderExist(id, user.id())) {
+            if (!folderDAO.checkOwner(id, user.id())) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 resp.getWriter().println("Folder is not valid");
             } else {
@@ -69,12 +72,9 @@ public class DeleteFolder extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                 else {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    resp.getWriter().println("Error while creating folder");
+                    resp.getWriter().println("Error while deleting folder");
                 }
             }
-        } catch (NumberFormatException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Folder is not valid");
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println("Error while deleting folder");

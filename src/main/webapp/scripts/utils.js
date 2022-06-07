@@ -7,21 +7,19 @@
  * @param reset specifies if the form should be reset after the call.
  */
 function makeCall(method, url, callBack, formElement, reset = true) {
-    const request = new XMLHttpRequest();
-    request.onreadystatechange = function () {
-        callBack(request);
-    };
-    request.open(method, url);
-    if (formElement != null) {
-        request.send(new FormData(formElement));
-    } else {
-        request.send();
-    }
+    sendFormData(method, url, callBack, new FormData(formElement));
     if (formElement != null && reset) {
         formElement.reset();
     }
 }
 
+/**
+ * This method sends a form data to the server.
+ * @param method specifies if the method is GET or POST.
+ * @param url specifies the url to call.
+ * @param callBack specifies the function to call when the call is done
+ * @param formData specifies the form data to send.
+ */
 function sendFormData(method, url, callBack, formData) {
     const request = new XMLHttpRequest();
     request.onreadystatechange = function () {
@@ -42,6 +40,15 @@ function sendFormData(method, url, callBack, formData) {
  */
 function checkEmail(email) {
     return email.match(
-        /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+        /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-\d]+\.)+[a-zA-Z]{2,}))$/
     );
+}
+
+/**
+ * This method escapes the html characters.
+ * @param unsafe the string we want to escape.
+ * @returns {string} the escaped string.
+ */
+const escapeHtml = (unsafe) => {
+    return unsafe.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#039;');
 }

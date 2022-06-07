@@ -41,19 +41,18 @@ public class CreateFolder extends HttpServlet {
 
     /**
      * Creates a new folder.
-     * @param req   an {@link HttpServletRequest} object that
-     *                  contains the request the client has made
-     *                  of the servlet
      *
-     * @param resp  an {@link HttpServletResponse} object that
-     *                  contains the response the servlet sends
-     *                  to the client
-     *
+     * @param req  an {@link HttpServletRequest} object that
+     *             contains the request the client has made
+     *             of the servlet
+     * @param resp an {@link HttpServletResponse} object that
+     *             contains the response the servlet sends
+     *             to the client
      * @throws IOException if an input or output error occurs
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        String name = StringEscapeUtils.escapeJava(req.getParameter("folderName"));
+        String name = req.getParameter("folderName");
         if (name == null || name.isEmpty() || !FolderDAO.checkName(name)) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().println("Name is not valid");
@@ -62,17 +61,11 @@ public class CreateFolder extends HttpServlet {
         User user = (User) req.getSession().getAttribute("user");
         try {
             FolderDAO folderDAO = new FolderDAO(connection);
-            if (folderDAO.doesFolderWithNameExist(name, user.id())) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().println("Folder already exists");
-            }
+            if (folderDAO.createFolder(name, user.id()))
+                resp.setStatus(HttpServletResponse.SC_OK);
             else {
-                if (folderDAO.createFolder(name, user.id()))
-                    resp.setStatus(HttpServletResponse.SC_OK);
-                else {
-                    resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    resp.getWriter().println("Error while creating folder");
-                }
+                resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                resp.getWriter().println("Error while creating folder");
             }
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

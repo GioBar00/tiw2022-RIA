@@ -52,22 +52,6 @@ public class DocumentDAO {
     }
 
     /**
-     * This method checks if a document with the same name already exists
-     *
-     * @return true if the document already exists, false otherwise
-     */
-    public boolean doesDocumentExists(int subFolderId, String name, String format) throws SQLException {
-        String query = "SELECT * FROM document WHERE subfolder_idsubfolder = ? AND name = ? AND format = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, subFolderId);
-            statement.setString(2, name);
-            statement.setString(3, format);
-            ResultSet resultSet = statement.executeQuery();
-            return resultSet.next();
-        }
-    }
-
-    /**
      * This method checks if the user has the right on a document.
      *
      * @param userId     the id of the user.

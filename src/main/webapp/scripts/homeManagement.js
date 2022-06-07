@@ -8,26 +8,34 @@
         if (sessionStorage.getItem("user") == null) {
             window.location.href = "login.html";
         } else {
-            document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
+            document.getElementById("userName").textContent = escapeHtml(JSON.parse(sessionStorage.getItem("user")).username);
             document.getElementById("Logout").addEventListener("click", function () {
-                makeCall("GET", 'logout', function (response) {
-                    if (response.readyState === XMLHttpRequest.DONE) {
-                        switch (response.status) {
-                            case 200:
-                                sessionStorage.clear();
-                                window.location.href = "login.html";
-                                break;
-                            default :
-                                alert("Unknown Error");
-                                break;
-                        }
-
-                }});
+                document.getElementById("Logout").disable = true;
+                logout();
             });
             pageOrchestrator.start();
             pageOrchestrator.refresh();
         }
     }, false);
+
+    /**
+     * This method logs out the user and goes to the login page.
+     */
+    function logout() {
+        makeCall("GET", 'logout', function (response) {
+            if (response.readyState === XMLHttpRequest.DONE) {
+                switch (response.status) {
+                    case 200:
+                        sessionStorage.clear();
+                        window.location.href = "login.html";
+                        break;
+                    default :
+                        alert("Unknown Error");
+                        break;
+                }
+            }
+        });
+    }
 
     /**
      * This class handles the list of folders and documents.
@@ -51,8 +59,7 @@
                             self.showContent(JSON.parse(text));
                             break;
                         case 403:
-                            sessionStorage.clear();
-                            window.location.href = "login.html";
+                            logout();
                             break;
                         case 500:
                             alert(text);
@@ -68,22 +75,20 @@
         this.edit = function () {
             const self = this;
             let editButton = document.getElementById("EditButton");
-            editButton.value = "UNDO";
+            editButton.textContent = "UNDO";
             editButton.onclick = function () {
                 self.undo();
                 pageOrchestrator.hideContent();
             };
             let showDetails = document.getElementsByClassName("ShowDetails");
-
-            for (let i = 0; i < showDetails.length; i++) {
-                showDetails[i].style.visibility = "hidden";
+            for (const btnDetail of showDetails) {
+                btnDetail.style.visibility = "hidden";
             }
 
             let editButtons = document.getElementsByClassName("mngBtn");
-            for (let i = 0; i < editButtons.length; i++) {
-                editButtons[i].style.visibility = "visible";
+            for (const editBtn of editButtons) {
+                editBtn.style.visibility = "visible";
             }
-
         }
 
         /**
@@ -93,21 +98,20 @@
             pageOrchestrator.hideContent();
             const self = this;
             let editButton = document.getElementById("EditButton");
-            editButton.value = "EDIT";
+            editButton.textContent = "EDIT";
             editButton.onclick = function () {
                 self.edit();
             };
 
             let showDetails = document.getElementsByClassName("ShowDetails");
-            for (let i = 0; i < showDetails.length; i++) {
-                showDetails[i].style.visibility = "visible";
+            for (const btnDetail of showDetails) {
+                btnDetail.style.visibility = "visible";
             }
 
             let editButtons = document.getElementsByClassName("mngBtn");
-            for (let i = 0; i < editButtons.length; i++) {
-                editButtons[i].style.visibility = "hidden";
+            for (const editBtn of editButtons) {
+                editBtn.style.visibility = "hidden";
             }
-
         }
 
         /**
@@ -119,7 +123,7 @@
             const self = this;
             //get edit button and set up onclick event.
             let editButton = document.getElementById("EditButton");
-            editButton.value = "EDIT";
+            editButton.textContent = "EDIT";
             editButton.onclick = function () {
                 self.edit();
             };
@@ -145,7 +149,7 @@
                 button.className = "mngBtn";
                 button.textContent = "Create SubFolder";
                 button.addEventListener("click", function (e) {
-                    createSubFolder.enableForm(e.target.closest("li").getAttribute("folderId"));
+                    createSubFolder.enableForm(folderWithSub.folder.id);
                 });
                 folderElement.appendChild(button);
 
@@ -167,7 +171,7 @@
                         button.textContent = "Create Document";
                         subFolderElement.appendChild(button);
                         button.addEventListener("click", function (e) {
-                            createDocument.enableForm(e.target.closest("li").getAttribute("subfolderId"));
+                            createDocument.enableForm(subFolderAndDocuments.subFolder.id);
                         })
 
                         subFolders.appendChild(subFolderElement);
@@ -180,15 +184,15 @@
                                 //create the li element that contains the document.
                                 let documentElement = document.createElement("li");
                                 documentElement.classList.add("document");
-                                documentElement.textContent = doc.name;
-                                let showDetails = document.createElement("a");
+                                documentElement.textContent = doc.name + "." + doc.format;
+                                let showDetails = document.createElement("button");
                                 showDetails.className = "ShowDetails";
-                                showDetails.textContent = "    Show Details";
+                                showDetails.textContent = "Show Details";
                                 documentElement.setAttribute("documentId", doc.id);
                                 documentElement.setAttribute("subfolderId", doc.subFolderId);
                                 //show details on click
                                 showDetails.addEventListener("click", function (e) {
-                                    documentDetails.showDocument(e.target.closest("li").getAttribute("documentId"));
+                                    documentDetails.showDocument(doc.id);
                                 });
                                 documentElement.appendChild(showDetails);
                                 documents.appendChild(documentElement);
@@ -200,6 +204,7 @@
                 }
                 self.containter.appendChild(folderElement);
             });
+
             //add the trashcan folder
             let trashCan = document.createElement("li");
             trashCan.textContent = "TrashCan";
@@ -457,7 +462,6 @@
     function ShowDocument(options) {
         this.container = options['container'];
         this.documentName = options['documentName'];
-        this.documentOwner = options['documentOwner'];
         this.documentDate = options['documentDate'];
         this.documentFormat = options['documentFormat'];
         this.documentSummary = options['documentSummary'];
@@ -507,7 +511,6 @@
             pageOrchestrator.hideContent();
             this.container.style.visibility = "visible";
             this.documentName.textContent = doc.name;
-            this.documentOwner.textContent = doc.owner;
             this.documentFormat.textContent = doc.format;
             this.documentSummary.textContent = doc.summary;
             this.documentDate.textContent = doc.date;
@@ -691,7 +694,6 @@
             documentDetails = new ShowDocument({
                 container: document.getElementById("documentDetails"),
                 documentName: document.getElementById("documentName"),
-                documentOwner: document.getElementById("documentOwner"),
                 documentDate: document.getElementById("documentDate"),
                 documentFormat: document.getElementById("documentFormat"),
                 documentSummary: document.getElementById("documentSummary"),

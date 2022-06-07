@@ -16,7 +16,7 @@ public class Logout extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Invalidate the session and redirect to the login page.
+     * Invalidate the session.
      *
      * @param req  an {@link HttpServletRequest} object that
      *             contains the request the client has made
@@ -24,10 +24,9 @@ public class Logout extends HttpServlet {
      * @param resp an {@link HttpServletResponse} object that
      *             contains the response the servlet sends
      *             to the client
-     * @throws IOException if an input or output error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
         req.getSession().invalidate();
         resp.setStatus(HttpServletResponse.SC_OK);
     }

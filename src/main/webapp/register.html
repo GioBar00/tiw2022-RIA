@@ -2,32 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Register</title>
+    <link rel="icon" type="image/x-icon" href="./images/favicon.png">
     <link rel="stylesheet" type="text/css" media="all" href="./css/style.css">
     <script src="scripts/utils.js" charset="utf-8" defer></script>
     <script src="scripts/registerManagement.js" charset="utf-8" defer></script>
 </head>
 <body>
-<div class = "header">Subscription Form</div>
-
-<div class="centered">
-    <fieldset>
-        <form action="#">
-            Username: <input type="text" name="username" required><br>
-            Name: <input type="text" name="name" required><br>
-            Surname: <input type="text" name="surname" required><br>
-            Email: <input type="text" id="email" required><br>
-            Password: <input type="password" id="password" required><br>
-            Confirm Password: <input type="password" id="confirmPassword" required><br>
-            <input id="sendSubmit" type="submit" value="Submit">
-        </form>
-        <p id="errorMsg"></p>
-    </fieldset>
-
-    <a href="login.html" style="float: right">Go to Login Page</a>
-
+<div class="header">
+    <h1 style="display: inline">Register</h1>
 </div>
-
-
+<div class="centered">
+    <form action="#" method="post">
+        <fieldset>
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br>
+            <label for="name">Name:</label>
+            <input type="text" id="name" name="name" required><br>
+            <label for="surname">Surname:</label>
+            <input type="text" id="surname" name="surname" required><br>
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email" required><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br>
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" required><br>
+            <input id="sendSubmit" type="button" value="Submit">
+            <p id="errorMsg" style="color: red"></p>
+        </fieldset>
+    </form>
+    <a href="login.html" style="float: right">Go to Login Page</a>
+</div>
 </body>
 </html>

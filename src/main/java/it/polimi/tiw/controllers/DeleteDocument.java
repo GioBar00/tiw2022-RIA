@@ -3,6 +3,7 @@ package it.polimi.tiw.controllers;
 import it.polimi.tiw.beans.User;
 import it.polimi.tiw.dao.DocumentDAO;
 import it.polimi.tiw.utils.ConnectionHandler;
+import it.polimi.tiw.utils.InputValidator;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -58,6 +59,8 @@ public class DeleteDocument extends HttpServlet {
                 resp.getWriter().println("Document is not valid");
                 return;
             }
+            if (!InputValidator.isInt(idDocument, resp))
+                return;
             int id = Integer.parseInt(idDocument);
             User user = (User) req.getSession().getAttribute("user");
             DocumentDAO documentDAO = new DocumentDAO(connection);
@@ -69,12 +72,9 @@ public class DeleteDocument extends HttpServlet {
                     resp.setStatus(HttpServletResponse.SC_OK);
                 else {
                     resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                    resp.getWriter().println("Error while creating folder");
+                    resp.getWriter().println("Error while deleting document");
                 }
             }
-        } catch (NumberFormatException e) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().println("Document is not valid");
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             resp.getWriter().println("Error while deleting document");

@@ -55,35 +55,35 @@ public class CreateDocument extends HttpServlet {
         String summary = request.getParameter("docSummary");
         String subFolderId = request.getParameter("subfolderId");
 
-        if(name == null || name.isEmpty())
-            if(format == null || format.isEmpty())
-                if(summary == null || summary.isEmpty())
-                    if(subFolderId == null || subFolderId.isEmpty()){
-                        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                        response.getWriter().println("The data are not correct");
-                        return;
-                    }
+        if (name == null || name.isEmpty() || format == null || format.isEmpty() || summary == null || summary.isEmpty() || subFolderId == null || subFolderId.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("The data is not correct");
+            return;
+        }
 
         if (!InputValidator.isInt(subFolderId, response))
             return;
+
+        name = name.trim();
+        format = format.trim();
+        summary = summary.trim();
+        int subFolderIdInt = Integer.parseInt(subFolderId);
 
         SubFolderDAO subFolderDAO = new SubFolderDAO(this.connection);
         DocumentDAO documentDAO = new DocumentDAO(this.connection);
         User user = (User) request.getSession().getAttribute("user");
 
         try {
-            if (subFolderDAO.checkOwner(user.id(), Integer.parseInt(subFolderId)))
-                if (subFolderDAO.checkName(name))
-                    if (documentDAO.checkName(name) && documentDAO.checkFormat(format) && documentDAO.checkSummary(summary)) {
-
-                        if (documentDAO.createDocument(name, format, summary, Integer.parseInt(subFolderId))) {
+            if (subFolderDAO.checkOwner(user.id(), subFolderIdInt))
+                if (SubFolderDAO.checkName(name))
+                    if (DocumentDAO.checkName(name) && DocumentDAO.checkFormat(format) && DocumentDAO.checkSummary(summary)) {
+                        if (documentDAO.createDocument(name, format, summary, subFolderIdInt)) {
                             response.setStatus(HttpServletResponse.SC_OK);
                             return;
                         }
-
                     }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data are not correct");
+            response.getWriter().println("The data is not correct");
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Error while processing the request");
