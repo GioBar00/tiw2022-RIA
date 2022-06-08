@@ -4,8 +4,9 @@
     form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (form.checkValidity()) {
-            if (document.getElementById("password").textContent === document.getElementById("confirmPassword").textContent) {
-                if (checkEmail(document.getElementById("email").textContent)) {
+            if (document.getElementById("password").value === document.getElementById("confirmPassword").value) {
+                let email = document.getElementById("emailInput");
+                if (checkEmail(email.value)) {
                     makeCall("POST", 'register', function (response) {
                         fieldSet.disabled = true;
                         if (response.readyState === XMLHttpRequest.DONE) {
