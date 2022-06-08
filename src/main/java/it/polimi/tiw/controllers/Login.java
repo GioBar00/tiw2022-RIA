@@ -42,7 +42,27 @@ public class Login extends HttpServlet {
     public void init() throws ServletException {
         ServletContext context = getServletContext();
         connection = ConnectionHandler.getConnection(context);
+    }
 
+    /**
+     * Checks if the user is logged in.
+     *
+     * @param request  an {@link HttpServletRequest} object that
+     *                 contains the request the client has made
+     *                 of the servlet
+     * @param response an {@link HttpServletResponse} object that
+     *                 contains the response the servlet sends
+     *                 to the client
+     * @throws IOException if an input or output error is
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (request.getSession().getAttribute("user") != null) {
+            sendUser(response, (User) request.getSession().getAttribute("user"));
+        } else {
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().println("You are not logged in.");
+        }
     }
 
     /**
@@ -90,6 +110,17 @@ public class Login extends HttpServlet {
 
         req.getSession().setAttribute("user", user);
 
+        sendUser(resp, user);
+    }
+
+    /**
+     * Sends the user to the client.
+     *
+     * @param resp {@link HttpServletResponse} object that contains the response the servlet sends to the client
+     * @param user {@link User} object that contains the user
+     * @throws IOException if an input or output error occurs
+     */
+    private void sendUser(HttpServletResponse resp, User user) throws IOException {
         Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
         String json = gson.toJson(user);
         resp.setStatus(HttpServletResponse.SC_OK);

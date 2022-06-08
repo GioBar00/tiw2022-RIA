@@ -5,10 +5,12 @@
  */
 (function () {
     const form = document.getElementById("loginForm");
+    const fieldSet = document.getElementById("loginFieldSet");
     form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (form.checkValidity()) {
             makeCall("POST", 'CheckLogin', function (response) {
+                fieldSet.disabled = true;
                 if (response.readyState === XMLHttpRequest.DONE) {
                     const message = response.responseText;
                     switch (response.status) {
@@ -27,6 +29,7 @@
                             alert(message);
                             break;
                     }
+                    fieldSet.disabled = false;
                 }
             }, form);
         } else form.reportValidity();

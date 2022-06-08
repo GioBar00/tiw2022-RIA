@@ -1,12 +1,14 @@
 (function () {
     const form = document.getElementById("registerForm");
+    const fieldSet = document.getElementById("registerFieldSet");
     form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (form.checkValidity()) {
             if (document.getElementById("password").textContent === document.getElementById("confirmPassword").textContent) {
                 if (checkEmail(document.getElementById("email").textContent)) {
                     makeCall("POST", 'register', function (response) {
-                        if (response.readyState === 4) {
+                        fieldSet.disabled = true;
+                        if (response.readyState === XMLHttpRequest.DONE) {
                             const message = response.responseText;
                             switch (response.status) {
                                 case 200 :
@@ -22,8 +24,8 @@
                                 default:
                                     alert();
                             }
+                            fieldSet.disabled = false;
                         }
-                        document.getElementById("sendSubmit").disabled = false;
                     }, form, false);
                 } else {
                     document.getElementById("errorMsg").textContent = "Email is not valid";

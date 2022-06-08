@@ -5,18 +5,34 @@
      * This method checks if the user is logged in.
      */
     window.addEventListener('load', function () {
-        if (sessionStorage.getItem("user") == null) {
-            window.location.href = "login.html";
-        } else {
-            document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
-            document.getElementById("Logout").addEventListener("click", function () {
-                document.getElementById("Logout").disable = true;
-                logout();
+        pageOrchestrator.start();
+        if (sessionStorage.getItem("user") === null) {
+            makeCall('GET', 'CheckLogin', function (response) {
+                if (response.readyState === XMLHttpRequest.DONE) {
+                    const text = response.responseText;
+                    if (response.status === 200) {
+                        sessionStorage.setItem("user", text);
+                        start();
+                    } else {
+                        logout();
+                    }
+                }
             });
-            pageOrchestrator.start();
-            pageOrchestrator.refresh();
+        } else {
+            start();
         }
+
+
     }, false);
+
+    function start() {
+        document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
+        document.getElementById("Logout").addEventListener("click", function () {
+            document.getElementById("Logout").disable = true;
+            logout();
+        });
+        pageOrchestrator.refresh();
+    }
 
     /**
      * This method logs out the user and goes to the login page.
@@ -234,6 +250,27 @@
         }
     }
 
+    function checkResponse(response) {
+        if (response.readyState === XMLHttpRequest.DONE) {
+            let text = response.responseText;
+            switch (response.status) {
+                case 200:
+                    pageOrchestrator.refresh();
+                    break;
+                case 401:
+                    alert("You are not logged in.")
+                    logout();
+                    break;
+                case 400:
+                case 500:
+                    alert(text);
+                    break;
+                default:
+                    alert("Unknown error");
+            }
+        }
+    }
+
     /**
      * This class handles the drag and drop functionalities.
      */
@@ -335,61 +372,19 @@
                         let formData = new FormData();
                         formData.append("documentId", self.startElement.getAttribute("documentId"));
                         sendFormData("POST", 'delete-document', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                let text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        folderList.show();
-                                        break;
-                                    case 400:
-                                        alert(text);
-                                        break;
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                }
-                            }
+                            checkResponse(response);
                         }, formData);
                     } else if (self.startElement.classList.contains("subfolder")) {
                         let formData = new FormData();
                         formData.append("subfolderId", self.startElement.getAttribute("subfolderId"));
                         sendFormData("POST", 'delete-subfolder', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                let text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        folderList.show();
-                                        break;
-                                    case 400:
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                }
-                            }
+                            checkResponse(response);
                         }, formData);
                     } else if (self.startElement.classList.contains("folder")) {
                         let formData = new FormData();
                         formData.append("folderId", self.startElement.getAttribute("folderId"));
                         sendFormData("POST", 'delete-folder', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                let text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        folderList.show();
-                                        break;
-                                    case 400:
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                }
-                            }
-
+                            checkResponse(response);
                         }, formData);
                     }
                 }
@@ -442,20 +437,7 @@
                         formData.append("documentId", self.startElement.getAttribute("documentId"));
                         //send the move request to the server. If it's successful the folder list is refreshed.
                         sendFormData("POST", 'move-document', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                let text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        pageOrchestrator.refresh();
-                                        break;
-                                    case 400:
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                }
-                            }
+                            checkResponse(response);
                         }, formData);
                     }
                     self.resetDroppable();
@@ -516,9 +498,11 @@
                         case 200:
                             self.setDocumentDetails(JSON.parse(text));
                             break;
-                        case 403:
-                            alert(text);
+                        case 401:
+                            alert("You are not logged in.")
+                            logout();
                             break;
+                        case 400:
                         case 500:
                             alert(text);
                             break;
@@ -576,25 +560,8 @@
                 if (form.checkValidity()) {
                     //make a request to the server to create the folder.
                     makeCall("POST", 'create-folder', function (response) {
-                            if (response.readyState === XMLHttpRequest.DONE) {
-                                const text = response.responseText;
-                                switch (response.status) {
-                                    case 200:
-                                        pageOrchestrator.refresh();
-                                        break;
-                                    case 400:
-                                        alert(text)
-                                        break;
-                                    case 500:
-                                        alert(text);
-                                        break;
-                                    default:
-                                        alert("Unknown error");
-                                        break;
-                                }
-                            }
-                        }
-                        , form);
+                        checkResponse(response);
+                    }, form);
                 } else form.reportValidity();
             }, false);
         }
@@ -630,23 +597,7 @@
                     formData.append("folderId", folderId);
                     //make a request to the server to create the sub-folder.
                     sendFormData("POST", 'create-subfolder', function (response) {
-                        if (response.readyState === XMLHttpRequest.DONE) {
-                            const text = response.responseText;
-                            switch (response.status) {
-                                case 200:
-                                    pageOrchestrator.refresh();
-                                    break;
-                                case 400:
-                                    alert(text)
-                                    break;
-                                case 500:
-                                    alert(text);
-                                    break;
-                                default:
-                                    alert("Unknown error");
-                                    break;
-                            }
-                        }
+                        checkResponse(response);
                     }, formData);
                     form.reset();
                 } else form.reportValidity();
@@ -685,23 +636,7 @@
                     formData.append("subfolderId", subfolderId);
                     //make a request to the server to create the document.
                     sendFormData("POST", 'create-document', function (response) {
-                        if (response.readyState === XMLHttpRequest.DONE) {
-                            const text = response.responseText;
-                            switch (response.status) {
-                                case 200:
-                                    pageOrchestrator.refresh();
-                                    break;
-                                case 400:
-                                    alert(text)
-                                    break;
-                                case 500:
-                                    alert(text);
-                                    break;
-                                default:
-                                    alert("Unknown error");
-                                    break;
-                            }
-                        }
+                        checkResponse(response);
                     }, formData);
                     form.reset();
                 } else form.reportValidity();
@@ -731,13 +666,13 @@
             createSubFolder = new CreateSubFolder(document.getElementById("createSubFolder"), document.getElementById("createSubFld"));
             createDocument = new CreateDocument(document.getElementById("createDocument"), document.getElementById("createDoc"));
             dragAndDropManager = new DragAndDropManager();
+            this.hideContent();
         }
 
         /**
          * This method refreshes the page.
          */
         this.refresh = function () {
-            this.hideContent();
             folderList.show();
         }
 
