@@ -72,7 +72,7 @@ public class DocumentDetails extends HttpServlet {
 
                 Document document = documentDAO.getDocument(id);
 
-                Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+                Gson gson = new GsonBuilder().setDateFormat("dd MMM yyyy").create();
                 String json = gson.toJson(document);
 
                 response.setContentType("application/json");

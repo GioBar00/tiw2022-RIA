@@ -18,50 +18,52 @@
         <button id="EditButton" type="button" style="float: left">Edit</button>
     </div>
 </div>
-
 <div id="folderList" class="left-div">
 </div>
 
-<div id="documentDetails" class="right-div">
+<div id="rightContainer" class="right-div">
+</div>
+
+<div id="documentDetails" style="padding: 0 5px">
+    <h3>Document details:</h3>
+    <h4>Name:</h4>
     <p id="documentName"></p>
-    <p id="documentDate"></p>
+    <h4>Format:</h4>
     <p id="documentFormat"></p>
+    <h4>Summary:</h4>
     <p id="documentSummary"></p>
+    <h4>Creation date:</h4>
+    <p id="documentDate"></p>
     <input type="button" id="hideDetails" value="Hide Details">
 </div>
 
-<footer class="footer">
-    <div class="left-form">
-        <form id="createFolder" action="#" class="creation-form">
-            Create a Folder<br>
-            <label for="folderName">Folder Name:</label>
-            <input type="text" id="folderName" name="folderName" required> <br>
-            <input type="submit" id="createFld" value="Create Folder">
-        </form>
-    </div>
+<form id="createFolder" action="#" class="creation-form">
+    <h3>Create a Folder</h3>
+    <label for="folderName">Folder Name:</label>
+    <input type="text" id="folderName" name="folderName" maxlength="50" required> <br>
+    <input type="submit" id="createFld" value="Create Folder">
+</form>
 
-    <div class="middle-form">
-        <form id="createSubFolder" action="#" class="creation-form">
-            Create a SubFolder<br>
-            <label for="subFolderName">SubFolder Name:</label>
-            <input type="text" id="subFolderName" name="subFolderName" required> <br>
-            <input type="button" id="createSubFld" value="Create SubFolder">
-        </form>
-    </div>
 
-    <div class="right-form">
-        <form id="createDocument" action="#" class="creation-form">
-            Create a Document<br>
-            <label for="docName">Name:</label>
-            <input type="text" id="docName" name="docName"><br>
-            <label for="docFormat">Format:</label>
-            <input type="text" id="docFormat" name="docFormat"><br>
-            <label for="docSummary">Summary:</label>
-            <input type="text" id="docSummary" name="docSummary"><br>
-            <input type="button" id="createDoc" value="Create Document">
-        </form>
-    </div>
-</footer>
+<form id="createSubFolder" action="#" class="creation-form">
+    <h3 id="createSubFolderTitle">Create a SubFolder</h3>
+    <label for="subFolderName">SubFolder Name:</label>
+    <input type="text" id="subFolderName" name="subFolderName" maxlength="50" required> <br>
+    <input type="submit" id="createSubFld" value="Create SubFolder">
+</form>
+
+
+<form id="createDocument" action="#" class="creation-form">
+    <h3 id="createDocumentTitle">Create a Document</h3>
+    <label for="docName">Name:</label>
+    <input type="text" id="docName" name="docName" maxlength="50" required><br>
+    <label for="docFormat">Format:</label>
+    <input type="text" id="docFormat" name="docFormat" maxlength="10" required><br>
+    <label for="docSummary">Summary:</label>
+    <textarea id="docSummary" name="docSummary" rows="5" maxlength="200" required></textarea><br>
+    <input type="submit" id="createDoc" value="Create Document">
+</form>
+
 
 </body>
 </html>

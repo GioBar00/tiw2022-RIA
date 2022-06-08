@@ -55,9 +55,14 @@ public class CreateSubFolder extends HttpServlet {
         String folderId = request.getParameter("folderId");
         String subFolder = request.getParameter("subFolderName");
 
-        if (folderId == null || folderId.isEmpty() || subFolder == null || subFolder.isEmpty()) {
+        if (folderId == null || folderId.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data is not correct");
+            response.getWriter().println("The folderId cannot be empty");
+            return;
+        }
+        if (subFolder == null || subFolder.isEmpty() || !SubFolderDAO.checkName(subFolder)) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.getWriter().println("The subfolder name is not valid.");
             return;
         }
 
@@ -73,8 +78,8 @@ public class CreateSubFolder extends HttpServlet {
                 if (subFolderDAO.createSubFolder(subFolder, new Date(new java.util.Date().getTime()), id)) {
                     response.setStatus(HttpServletResponse.SC_OK);
                 } else {
-                    response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                    response.getWriter().println("The data is not correct");
+                    response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    response.getWriter().println("Subfolder could not be created.");
                 }
             }
         } catch (SQLException e) {

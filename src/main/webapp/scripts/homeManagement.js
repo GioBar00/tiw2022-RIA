@@ -1,28 +1,32 @@
 {
+    /**
+     * This method checks if the user is logged in.
+     */
+    if (sessionStorage.getItem("user") === null) {
+        makeCall('GET', 'CheckLogin', function (response) {
+            if (response.readyState === XMLHttpRequest.DONE) {
+                const text = response.responseText;
+                if (response.status === 200) {
+                    sessionStorage.setItem("user", text);
+                } else {
+                    logout();
+                }
+            }
+        });
+    }
+
     let folderList, documentDetails, createFolder, createSubFolder, createDocument, dragAndDropManager,
         pageOrchestrator = new PageOrchestrator();
     /**
-     * This method checks if the user is logged in.
+     * This starts the page if the user is logged in.
      */
     window.addEventListener('load', function () {
         pageOrchestrator.start();
         if (sessionStorage.getItem("user") === null) {
-            makeCall('GET', 'CheckLogin', function (response) {
-                if (response.readyState === XMLHttpRequest.DONE) {
-                    const text = response.responseText;
-                    if (response.status === 200) {
-                        sessionStorage.setItem("user", text);
-                        start();
-                    } else {
-                        logout();
-                    }
-                }
-            });
+            logout()
         } else {
             start();
         }
-
-
     }, false);
 
     function start() {
@@ -143,14 +147,23 @@
             editButton.onclick = function () {
                 self.edit();
             };
+
             //create new folder button.
             let button = document.createElement("button");
             button.className = "mngBtn";
             button.textContent = "Create Folder";
+            button.style.float = "right";
+            button.style.marginRight = "10px";
+            button.style.marginTop = "20px";
             button.addEventListener("click", function () {
                 createFolder.enableForm();
             });
             this.containter.appendChild(button);
+
+            let title = document.createElement("h3");
+            title.textContent = "Folders:";
+            title.style.paddingLeft = "5px";
+            this.containter.appendChild(title);
 
             let foldersUL = document.createElement("ul");
 
@@ -169,7 +182,7 @@
                 button.className = "mngBtn";
                 button.textContent = "Create SubFolder";
                 button.addEventListener("click", function () {
-                    createSubFolder.enableForm(folderWithSub.folder.id);
+                    createSubFolder.enableForm(folderWithSub.folder.id, folderWithSub.folder.name);
                 });
                 folderLi.appendChild(folderDiv);
                 folderLi.appendChild(button);
@@ -194,7 +207,7 @@
                         button.textContent = "Create Document";
                         subFolderLi.appendChild(button);
                         button.addEventListener("click", function () {
-                            createDocument.enableForm(subFolderAndDocuments.subFolder.id);
+                            createDocument.enableForm(subFolderAndDocuments.subFolder.id, subFolderAndDocuments.subFolder.name);
                         })
 
                         subFolderUL.appendChild(subFolderLi);
@@ -470,18 +483,16 @@
      * @param options a list of container elements.
      */
     function ShowDocument(options) {
-        this.container = options['container'];
-        this.documentName = options['documentName'];
-        this.documentDate = options['documentDate'];
-        this.documentFormat = options['documentFormat'];
-        this.documentSummary = options['documentSummary'];
-        this.button = options['button'];
+        const documentDetails = document.getElementById("documentDetails");
+        documentDetails.parentNode.removeChild(documentDetails);
 
         /**
          * Hides the document details.
          */
         this.hide = function () {
-            this.container.style.visibility = "hidden";
+            document.getElementById("rightContainer").style.visibility = "hidden";
+            if (document.getElementById("rightContainer").contains(documentDetails))
+                document.getElementById("rightContainer").removeChild(documentDetails);
         };
 
         /**
@@ -497,6 +508,7 @@
                     switch (response.status) {
                         case 200:
                             self.setDocumentDetails(JSON.parse(text));
+                            document.getElementById("rightContainer").appendChild(documentDetails);
                             break;
                         case 401:
                             alert("You are not logged in.")
@@ -521,14 +533,14 @@
          */
         this.setDocumentDetails = function (doc) {
             pageOrchestrator.hideContent();
-            this.container.style.visibility = "visible";
-            this.documentName.textContent = doc.name;
-            this.documentFormat.textContent = doc.format;
-            this.documentSummary.textContent = doc.summary;
-            this.documentDate.textContent = doc.date;
+            document.getElementById("rightContainer").style.visibility = "visible";
+            options['documentName'].textContent = doc.name;
+            options['documentFormat'].textContent = doc.format;
+            options['documentSummary'].textContent = doc.summary;
+            options['documentDate'].textContent = doc.creationDate;
 
-            this.button.addEventListener("click", function (e) {
-                e.target.closest("div").style.visibility = "hidden";
+            options['button'].addEventListener("click", function () {
+                document.getElementById("rightContainer").style.visibility = "hidden";
             });
         }
     }
@@ -539,14 +551,16 @@
      * @param button the button related to submit of the form.
      */
     function CreateFolder(container, button) {
-        this.container = container;
-        this.button = button;
+        const form = document.getElementById("createFolder");
+        form.parentNode.removeChild(form);
 
         /**
          * Hides the container.
          */
         this.hide = function () {
             container.style.visibility = "hidden";
+            if (container.contains(form))
+                container.removeChild(form);
         }
 
         /**
@@ -555,15 +569,17 @@
         this.enableForm = function () {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            button.addEventListener("click", function (e) {
-                const form = e.target.closest("form");
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
                 if (form.checkValidity()) {
                     //make a request to the server to create the folder.
                     makeCall("POST", 'create-folder', function (response) {
                         checkResponse(response);
-                    }, form);
+                    }, form, false);
+                    form.reset();
                 } else form.reportValidity();
             }, false);
+            container.appendChild(form);
         }
     }
 
@@ -573,25 +589,28 @@
      * @param button the button related to submit of the form.
      */
     function CreateSubFolder(container, button) {
-        this.container = container;
         this.button = button;
+        const title = document.getElementById("createSubFolderTitle");
+        const form = document.getElementById("createSubFolder");
+        form.parentNode.removeChild(form);
 
         /**
          * Hides the container.
          */
         this.hide = function () {
             container.style.visibility = "hidden";
+            if (container.contains(form))
+                container.removeChild(form);
         }
 
         /**
          * This method sets the create subfolder form visible and the event on the submit button.
          */
-        this.enableForm = function (folderId) {
+        this.enableForm = function (folderId, folderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            button.addEventListener("click", function (e) {
-                const form = e.target.closest("form");
-
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
                 if (form.checkValidity()) {
                     const formData = new FormData(form);
                     formData.append("folderId", folderId);
@@ -602,6 +621,8 @@
                     form.reset();
                 } else form.reportValidity();
             }, false);
+            title.textContent = "Create subfolder inside folder " + folderName;
+            container.appendChild(form);
         }
 
     }
@@ -612,25 +633,28 @@
      * @param button the button related to submit of the form.
      */
     function CreateDocument(container, button) {
-        this.container = container;
         this.button = button;
+        const title = document.getElementById("createDocumentTitle");
+        const form = document.getElementById("createDocument");
+        form.parentNode.removeChild(form);
 
         /**
          * Hides the container.
          */
         this.hide = function () {
             container.style.visibility = "hidden";
+            if (container.contains(form))
+                container.removeChild(form);
         }
 
         /**
          * This method sets the create document form visible and the event on the submit button.
          */
-        this.enableForm = function (subfolderId) {
+        this.enableForm = function (subfolderId, subfolderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-
-            button.addEventListener("click", function (e) {
-                const form = e.target.closest("form");
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
                 if (form.checkValidity()) {
                     const formData = new FormData(form);
                     formData.append("subfolderId", subfolderId);
@@ -641,7 +665,8 @@
                     form.reset();
                 } else form.reportValidity();
             }, false);
-
+            title.textContent = "Create document inside subfolder " + subfolderName;
+            container.appendChild(form);
         }
     }
 
@@ -654,17 +679,17 @@
          */
         this.start = function () {
             folderList = new FolderList(document.getElementById("folderList"));
+            const rightContainer = document.getElementById("rightContainer");
             documentDetails = new ShowDocument({
-                container: document.getElementById("documentDetails"),
                 documentName: document.getElementById("documentName"),
                 documentDate: document.getElementById("documentDate"),
                 documentFormat: document.getElementById("documentFormat"),
                 documentSummary: document.getElementById("documentSummary"),
                 button: document.getElementById("hideDetails")
             });
-            createFolder = new CreateFolder(document.getElementById("createFolder"), document.getElementById("createFld"));
-            createSubFolder = new CreateSubFolder(document.getElementById("createSubFolder"), document.getElementById("createSubFld"));
-            createDocument = new CreateDocument(document.getElementById("createDocument"), document.getElementById("createDoc"));
+            createFolder = new CreateFolder(rightContainer, document.getElementById("createFld"));
+            createSubFolder = new CreateSubFolder(rightContainer, document.getElementById("createSubFld"));
+            createDocument = new CreateDocument(rightContainer, document.getElementById("createDoc"));
             dragAndDropManager = new DragAndDropManager();
             this.hideContent();
         }

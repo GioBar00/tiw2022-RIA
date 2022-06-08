@@ -76,7 +76,7 @@ public class GetFolders extends HttpServlet {
                     view.add(new FolderAndSubFolders(folder, subFolders));
                 }
 
-                Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+                Gson gson = new GsonBuilder().setDateFormat("dd MMM yyyy").create();
                 String json = gson.toJson(view);
 
                 resp.setContentType("application/json");

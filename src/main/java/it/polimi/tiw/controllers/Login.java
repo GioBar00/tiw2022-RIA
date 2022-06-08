@@ -121,7 +121,7 @@ public class Login extends HttpServlet {
      * @throws IOException if an input or output error occurs
      */
     private void sendUser(HttpServletResponse resp, User user) throws IOException {
-        Gson gson = new GsonBuilder().setDateFormat("yyyy MMM dd").create();
+        Gson gson = new GsonBuilder().setDateFormat("dd MMM yyyy").create();
         String json = gson.toJson(user);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");

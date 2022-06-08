@@ -65,7 +65,7 @@ public class CreateFolder extends HttpServlet {
                 resp.setStatus(HttpServletResponse.SC_OK);
             else {
                 resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-                resp.getWriter().println("Error while creating folder");
+                resp.getWriter().println("Folder could not be created");
             }
         } catch (SQLException e) {
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

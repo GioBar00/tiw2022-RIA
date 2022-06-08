@@ -57,7 +57,7 @@ public class CreateDocument extends HttpServlet {
 
         if (name == null || name.isEmpty() || format == null || format.isEmpty() || summary == null || summary.isEmpty() || subFolderId == null || subFolderId.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data is not correct");
+            response.getWriter().println("The data cannot be empty");
             return;
         }
 
@@ -75,15 +75,14 @@ public class CreateDocument extends HttpServlet {
 
         try {
             if (subFolderDAO.checkOwner(user.id(), subFolderIdInt))
-                if (SubFolderDAO.checkName(name))
-                    if (DocumentDAO.checkName(name) && DocumentDAO.checkFormat(format) && DocumentDAO.checkSummary(summary)) {
-                        if (documentDAO.createDocument(name, format, summary, subFolderIdInt)) {
-                            response.setStatus(HttpServletResponse.SC_OK);
-                            return;
-                        }
+                if (DocumentDAO.checkName(name) && DocumentDAO.checkFormat(format) && DocumentDAO.checkSummary(summary)) {
+                    if (documentDAO.createDocument(name, format, summary, subFolderIdInt)) {
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        return;
                     }
+                }
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("The data is not correct");
+            response.getWriter().println("The data is not valid");
         } catch (SQLException e) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             response.getWriter().println("Error while processing the request");

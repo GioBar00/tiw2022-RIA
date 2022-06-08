@@ -57,34 +57,6 @@ public class SubFolderDAO {
         }
     }
 
-
-    /**
-     * This method returns all {@link Document}(s) in a specified subFolder.
-     *
-     * @param subFolderId the id of the subFolder.
-     * @return {@link List} of {@link Document}.
-     * @throws SQLException if an error occurs during the query.
-     */
-    public List<Document> getDocuments(int subFolderId) throws SQLException {
-        String query = "SELECT * FROM document WHERE subfolder_idsubfolder = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, subFolderId);
-            ResultSet resultSet = statement.executeQuery();
-
-            List<Document> documents = new ArrayList<>();
-            while (resultSet.next()) {
-                Document document = new Document(resultSet.getInt("iddocument"),
-                        resultSet.getString("name"),
-                        resultSet.getString("format"),
-                        resultSet.getString("summary"),
-                        resultSet.getDate("creationDate"),
-                        subFolderId);
-                documents.add(document);
-            }
-            return documents;
-        }
-    }
-
     /**
      * This method create a new {@link it.polimi.tiw.beans.SubFolder} in the database.
      *
@@ -118,28 +90,5 @@ public class SubFolderDAO {
             statement.setInt(1, subFolderId);
             return statement.executeUpdate() > 0;
         }
-    }
-
-    /**
-     * This method gets the {@link SubFolder} with the specified id.
-     *
-     * @param subFolderId the id of the subFolder.
-     * @return the {@link SubFolder} with the specified id.
-     * @throws SQLException if an error occurs during the query.
-     */
-    public SubFolder getSubFolder(int subFolderId) throws SQLException {
-        String query = "SELECT * FROM subfolder WHERE idsubfolder = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, subFolderId);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                return new SubFolder(resultSet.getInt("idsubfolder"),
-                        resultSet.getString("name"),
-                        resultSet.getDate("creationDate"),
-                        resultSet.getInt("folder_idfolder"));
-            }
-        }
-        return null;
     }
 }
