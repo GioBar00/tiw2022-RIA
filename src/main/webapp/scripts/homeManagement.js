@@ -30,7 +30,7 @@
     }, false);
 
     function start() {
-        document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user")).username;
+        document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user"));
         document.getElementById("Logout").addEventListener("click", function () {
             document.getElementById("Logout").disable = true;
             logout();
