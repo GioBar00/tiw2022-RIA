@@ -72,6 +72,9 @@ public class Register extends HttpServlet {
             return;
         }
 
+        name = name.trim();
+        surname = surname.trim();
+
         UserDAO userDAO = new UserDAO(connection);
         try {
 
