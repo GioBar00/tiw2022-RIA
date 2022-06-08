@@ -1,4 +1,8 @@
 (function () {
+    if (localStorage.getItem("user") !== null) {
+        window.location.href = "index.html";
+    }
+
     const form = document.getElementById("registerForm");
     const fieldSet = document.getElementById("registerFieldSet");
     form.addEventListener("submit", function (e) {

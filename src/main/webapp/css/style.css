@@ -172,3 +172,9 @@ ul div {
 .dragging {
     opacity: .5;
 }
+
+.icon {
+    height: 15px;
+    width: 15px;
+    margin-right: 5px;
+}

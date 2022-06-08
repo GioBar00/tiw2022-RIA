@@ -4,6 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import it.polimi.tiw.beans.*;
 import it.polimi.tiw.dao.FolderDAO;
+import it.polimi.tiw.records.FolderAndSubFolders;
+import it.polimi.tiw.records.SubFolderAndDocuments;
 import it.polimi.tiw.utils.ConnectionHandler;
 
 import javax.servlet.ServletContext;

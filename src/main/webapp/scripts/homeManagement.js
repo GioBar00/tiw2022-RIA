@@ -2,17 +2,8 @@
     /**
      * This method checks if the user is logged in.
      */
-    if (sessionStorage.getItem("user") === null) {
-        makeCall('GET', 'CheckLogin', function (response) {
-            if (response.readyState === XMLHttpRequest.DONE) {
-                const text = response.responseText;
-                if (response.status === 200) {
-                    sessionStorage.setItem("user", text);
-                } else {
-                    logout();
-                }
-            }
-        });
+    if (localStorage.getItem("user") === null) {
+        logout();
     }
 
     let folderList, documentDetails, createFolder, createSubFolder, createDocument, dragAndDropManager,
@@ -22,7 +13,7 @@
      */
     window.addEventListener('load', function () {
         pageOrchestrator.start();
-        if (sessionStorage.getItem("user") === null) {
+        if (localStorage.getItem("user") === null) {
             logout()
         } else {
             start();
@@ -30,7 +21,7 @@
     }, false);
 
     function start() {
-        document.getElementById("userName").textContent = JSON.parse(sessionStorage.getItem("user"));
+        document.getElementById("userName").textContent = JSON.parse(localStorage.getItem("user"));
         document.getElementById("Logout").addEventListener("click", function () {
             document.getElementById("Logout").disable = true;
             logout();
@@ -42,11 +33,13 @@
      * This method logs out the user and goes to the login page.
      */
     function logout() {
+        let loggedOut = false;
         makeCall("GET", 'logout', function (response) {
             if (response.readyState === XMLHttpRequest.DONE) {
                 switch (response.status) {
                     case 200:
-                        sessionStorage.clear();
+                        loggedOut = true;
+                        localStorage.clear();
                         window.location.href = "login.html";
                         break;
                     default :
@@ -55,7 +48,12 @@
                 }
             }
         });
+        if (!loggedOut) {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
     }
+
 
     /**
      * This class handles the list of folders and documents.
@@ -78,6 +76,7 @@
                         case 200:
                             self.showContent(JSON.parse(text));
                             break;
+                        case 401:
                         case 403:
                             logout();
                             break;
@@ -158,12 +157,12 @@
             button.addEventListener("click", function () {
                 createFolder.enableForm();
             });
-            this.containter.appendChild(button);
+            this.containter.append(button);
 
             let title = document.createElement("h3");
             title.textContent = "Folders:";
             title.style.paddingLeft = "5px";
-            this.containter.appendChild(title);
+            this.containter.append(title);
 
             let foldersUL = document.createElement("ul");
 
@@ -184,8 +183,8 @@
                 button.addEventListener("click", function () {
                     createSubFolder.enableForm(folderWithSub.folder.id, folderWithSub.folder.name);
                 });
-                folderLi.appendChild(folderDiv);
-                folderLi.appendChild(button);
+                folderLi.append(folderDiv);
+                folderLi.append(button);
 
                 //for each subfolder.
                 if (folderWithSub.subFolderAndDocumentsList != null && folderWithSub.subFolderAndDocumentsList.length > 0) {
@@ -199,18 +198,18 @@
                         subFolderDiv.textContent = subFolderAndDocuments.subFolder.name;
                         subFolderDiv.setAttribute("subfolderId", subFolderAndDocuments.subFolder.id);
                         //subFolderDiv.style.display = "inline";
-                        subFolderLi.appendChild(subFolderDiv);
+                        subFolderLi.append(subFolderDiv);
 
                         // create new document button
                         let button = document.createElement("button");
                         button.className = "mngBtn";
                         button.textContent = "Create Document";
-                        subFolderLi.appendChild(button);
+                        subFolderLi.append(button);
                         button.addEventListener("click", function () {
                             createDocument.enableForm(subFolderAndDocuments.subFolder.id, subFolderAndDocuments.subFolder.name);
                         })
 
-                        subFolderUL.appendChild(subFolderLi);
+                        subFolderUL.append(subFolderLi);
 
                         //for each document.
                         if (subFolderAndDocuments.documentList != null && subFolderAndDocuments.documentList.length > 0) {
@@ -225,7 +224,7 @@
                                 documentDiv.textContent = doc.name + "." + doc.format;
                                 documentDiv.setAttribute("documentId", doc.id);
                                 documentDiv.setAttribute("subfolderId", doc.subFolderId);
-                                documentLi.appendChild(documentDiv);
+                                documentLi.append(documentDiv);
 
                                 let showDetails = document.createElement("button");
                                 showDetails.className = "ShowDetails";
@@ -234,15 +233,15 @@
                                 showDetails.addEventListener("click", function () {
                                     documentDetails.showDocument(doc.id);
                                 });
-                                documentLi.appendChild(showDetails);
-                                documentUL.appendChild(documentLi);
+                                documentLi.append(showDetails);
+                                documentUL.append(documentLi);
                             });
-                            subFolderUL.appendChild(documentUL);
+                            subFolderUL.append(documentUL);
                         }
                     });
-                    folderLi.appendChild(subFolderUL);
+                    folderLi.append(subFolderUL);
                 }
-                foldersUL.appendChild(folderLi);
+                foldersUL.append(folderLi);
             });
 
             //add the trashcan folder
@@ -250,10 +249,14 @@
             let trashCanDiv = document.createElement("div");
             trashCanDiv.textContent = "TrashCan";
             trashCanDiv.id = "trashCan";
-            trashCanLi.appendChild(trashCanDiv);
-            foldersUL.appendChild(trashCanLi);
+            let trashIcon = document.createElement("img");
+            trashIcon.className = "icon";
+            trashIcon.setAttribute("src", "images/trash.png");
+            trashCanDiv.prepend(trashIcon);
+            trashCanLi.append(trashCanDiv);
+            foldersUL.append(trashCanLi);
 
-            self.containter.appendChild(foldersUL);
+            self.containter.append(foldersUL);
 
             //set the edit button to edit mode
             this.undo();
@@ -508,7 +511,7 @@
                     switch (response.status) {
                         case 200:
                             self.setDocumentDetails(JSON.parse(text));
-                            document.getElementById("rightContainer").appendChild(documentDetails);
+                            document.getElementById("rightContainer").append(documentDetails);
                             break;
                         case 401:
                             alert("You are not logged in.")
@@ -579,7 +582,7 @@
                     form.reset();
                 } else form.reportValidity();
             }, false);
-            container.appendChild(form);
+            container.append(form);
         }
     }
 
@@ -622,7 +625,7 @@
                 } else form.reportValidity();
             }, false);
             title.textContent = "Create subfolder inside folder " + folderName;
-            container.appendChild(form);
+            container.append(form);
         }
 
     }
@@ -666,7 +669,7 @@
                 } else form.reportValidity();
             }, false);
             title.textContent = "Create document inside subfolder " + subfolderName;
-            container.appendChild(form);
+            container.append(form);
         }
     }
 

@@ -4,6 +4,9 @@
  * After the request, analyzes the response and if it 's valid send a redirect to the home page.
  */
 (function () {
+    if (localStorage.getItem("user") !== null) {
+        window.location.href = "index.html";
+    }
     const form = document.getElementById("loginForm");
     const fieldSet = document.getElementById("loginFieldSet");
     form.addEventListener("submit", function (e) {
@@ -15,7 +18,7 @@
                     const message = response.responseText;
                     switch (response.status) {
                         case 200:
-                            sessionStorage.setItem("user", message);
+                            localStorage.setItem("user", message);
                             window.location.href = "index.html";
                             break;
                         case 400:
