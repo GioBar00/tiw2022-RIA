@@ -122,7 +122,7 @@ public class Login extends HttpServlet {
      */
     private void sendUser(HttpServletResponse resp, User user) throws IOException {
         Gson gson = new GsonBuilder().setDateFormat("dd MMM yyyy").create();
-        String json = gson.toJson(user);
+        String json = gson.toJson(user.username());
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.setContentType("application/json");
         resp.setCharacterEncoding("UTF-8");
