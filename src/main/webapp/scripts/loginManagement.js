@@ -22,6 +22,8 @@
                             window.location.href = "index.html";
                             break;
                         case 400:
+                            window.location.href = "index.html";
+                            break;
                         case 401:
                             document.getElementById("errorMsg").textContent = message;
                             break;
@@ -29,7 +31,7 @@
                             alert(message);
                             break;
                         default:
-                            alert(message);
+                            alert("Unknown error" + "\n" + message);
                             break;
                     }
                     fieldSet.disabled = false;

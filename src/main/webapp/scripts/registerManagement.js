@@ -23,11 +23,13 @@
                                     document.getElementById("errorMsg").textContent = message;
                                     break;
                                 case 400:
+                                    window.location.href = "index.html";
+                                    break;
                                 case 500:
                                     alert(message);
                                     break;
                                 default:
-                                    alert();
+                                    alert("Unknown error" + "\n" + message);
                             }
                             fieldSet.disabled = false;
                         }
