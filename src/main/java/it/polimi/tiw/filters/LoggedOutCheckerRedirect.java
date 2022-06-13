@@ -10,8 +10,8 @@ import java.io.IOException;
 /**
  * Servlet Filter checks if the user is logged out.
  */
-@WebFilter({"/CheckLogin", "/register"})
-public class LoggedOutChecker implements Filter {
+@WebFilter({"/login.html", "/register.html"})
+public class LoggedOutCheckerRedirect implements Filter {
 
     /**
      * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
@@ -28,9 +28,8 @@ public class LoggedOutChecker implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest httpRequest = (HttpServletRequest) request;
         HttpSession session = httpRequest.getSession();
-        if (!session.isNew() && session.getAttribute("user") != null && httpRequest.getMethod().equals("POST")) {
-            ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            response.getWriter().println("You are already logged in. Logout first.");
+        if (!session.isNew() && session.getAttribute("user") != null) {
+            ((HttpServletResponse) response).sendRedirect(((HttpServletRequest) request).getContextPath() + "/");
         } else {
             chain.doFilter(request, response);
         }
