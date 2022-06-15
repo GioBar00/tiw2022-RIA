@@ -612,11 +612,11 @@
         this.enableForm = function (folderId, folderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
+            container.getElementsByClassName("folder-name").value
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
                 if (form.checkValidity()) {
                     const formData = new FormData(form);
-                    formData.append("folderId", folderId);
                     //make a request to the server to create the sub-folder.
                     sendFormData("POST", 'create-subfolder', function (response) {
                         checkResponse(response);
@@ -624,6 +624,7 @@
                     form.reset();
                 } else form.reportValidity();
             }, false);
+            form.getElementsByClassName("hiddenInput")[0].value = folderId;
             title.textContent = "Create subfolder inside folder " + folderName;
             container.append(form);
         }
@@ -660,7 +661,6 @@
                 e.preventDefault();
                 if (form.checkValidity()) {
                     const formData = new FormData(form);
-                    formData.append("subfolderId", subfolderId);
                     //make a request to the server to create the document.
                     sendFormData("POST", 'create-document', function (response) {
                         checkResponse(response);
@@ -668,6 +668,7 @@
                     form.reset();
                 } else form.reportValidity();
             }, false);
+            form.getElementsByClassName("hiddenInput")[0].value = subfolderId;
             title.textContent = "Create document inside subfolder " + subfolderName;
             container.append(form);
         }
