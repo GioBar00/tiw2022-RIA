@@ -39,7 +39,7 @@ public class DocumentDAO {
      * @return true the format is valid, false otherwise
      */
     public static boolean checkFormat(String format) {
-        return (format != null && format.length() > 0 && format.length() <= 10);
+        return (format != null && format.length() > 0 && format.length() <= 10) && format.matches("^[^\\s.]{1,10}$");
     }
 
     /**

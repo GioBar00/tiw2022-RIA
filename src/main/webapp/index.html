@@ -59,7 +59,7 @@
     <label for="docName">Name:</label>
     <input type="text" id="docName" name="docName" maxlength="50" required><br>
     <label for="docFormat">Format:</label>
-    <input type="text" id="docFormat" name="docFormat" maxlength="10" required><br>
+    <input type="text" id="docFormat" name="docFormat" maxlength="10" pattern="^[^\s.]{1,10}$" required><br>
     <label for="docSummary">Summary:</label>
     <textarea id="docSummary" name="docSummary" rows="5" maxlength="200" required></textarea><br>
     <input type="hidden" id="subfolderId" name="subfolderId" class="hiddenInput">
