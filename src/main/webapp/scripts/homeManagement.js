@@ -612,7 +612,6 @@
         this.enableForm = function (folderId, folderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            container.getElementsByClassName("folder-name").value
             form.addEventListener("submit", function (e) {
                 e.preventDefault();
                 if (form.checkValidity()) {
