@@ -174,7 +174,7 @@ public class UserDAO {
      * @return true if the name is valid, false otherwise.
      */
     public static boolean isValidName(String name) {
-        return name != null && name.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
+        return name != null && name.matches("[a-zA-Z\\s']{3,20}$");
     }
 
     /**
@@ -184,6 +184,6 @@ public class UserDAO {
      * @return true if the surname is valid, false otherwise.
      */
     public static boolean isValidSurname(String surname) {
-        return surname != null && surname.matches("[a-zA-Z\\s'èéòàù]{3,20}$");
+        return surname != null && surname.matches("[a-zA-Z\\s']{3,20}$");
     }
 }
