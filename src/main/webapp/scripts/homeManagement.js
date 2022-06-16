@@ -555,6 +555,16 @@
      */
     function CreateFolder(container, button) {
         const form = document.getElementById("createFolder");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (form.checkValidity()) {
+                //make a request to the server to create the folder.
+                makeCall("POST", 'create-folder', function (response) {
+                    checkResponse(response);
+                }, form, false);
+                form.reset();
+            } else form.reportValidity();
+        }, false);
         form.parentNode.removeChild(form);
 
         /**
@@ -572,16 +582,6 @@
         this.enableForm = function () {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-                if (form.checkValidity()) {
-                    //make a request to the server to create the folder.
-                    makeCall("POST", 'create-folder', function (response) {
-                        checkResponse(response);
-                    }, form, false);
-                    form.reset();
-                } else form.reportValidity();
-            }, false);
             container.append(form);
         }
     }
@@ -596,6 +596,17 @@
         const title = document.getElementById("createSubFolderTitle");
         const form = document.getElementById("createSubFolder");
         form.parentNode.removeChild(form);
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (form.checkValidity()) {
+                const formData = new FormData(form);
+                //make a request to the server to create the sub-folder.
+                sendFormData("POST", 'create-subfolder', function (response) {
+                    checkResponse(response);
+                }, formData);
+                form.reset();
+            } else form.reportValidity();
+        }, false);
 
         /**
          * Hides the container.
@@ -612,17 +623,6 @@
         this.enableForm = function (folderId, folderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-                if (form.checkValidity()) {
-                    const formData = new FormData(form);
-                    //make a request to the server to create the sub-folder.
-                    sendFormData("POST", 'create-subfolder', function (response) {
-                        checkResponse(response);
-                    }, formData);
-                    form.reset();
-                } else form.reportValidity();
-            }, false);
             form.getElementsByClassName("hiddenInput")[0].value = folderId;
             title.textContent = "Create subfolder inside folder " + folderName;
             container.append(form);
@@ -639,6 +639,17 @@
         this.button = button;
         const title = document.getElementById("createDocumentTitle");
         const form = document.getElementById("createDocument");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+            if (form.checkValidity()) {
+                const formData = new FormData(form);
+                //make a request to the server to create the document.
+                sendFormData("POST", 'create-document', function (response) {
+                    checkResponse(response);
+                }, formData);
+                form.reset();
+            } else form.reportValidity();
+        }, false);
         form.parentNode.removeChild(form);
 
         /**
@@ -656,17 +667,6 @@
         this.enableForm = function (subfolderId, subfolderName) {
             pageOrchestrator.hideContent();
             container.style.visibility = "visible";
-            form.addEventListener("submit", function (e) {
-                e.preventDefault();
-                if (form.checkValidity()) {
-                    const formData = new FormData(form);
-                    //make a request to the server to create the document.
-                    sendFormData("POST", 'create-document', function (response) {
-                        checkResponse(response);
-                    }, formData);
-                    form.reset();
-                } else form.reportValidity();
-            }, false);
             form.getElementsByClassName("hiddenInput")[0].value = subfolderId;
             title.textContent = "Create document inside subfolder " + subfolderName;
             container.append(form);

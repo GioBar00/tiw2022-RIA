@@ -67,7 +67,7 @@ public class Register extends HttpServlet {
                 confirmPassword == null || confirmPassword.isEmpty() ||
                 name == null || name.isEmpty() ||
                 surname == null || surname.isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
             resp.getWriter().println("Missing parameters");
             return;
         }
@@ -100,10 +100,7 @@ public class Register extends HttpServlet {
                 error = null;
 
             if (error != null) {
-                if (error == RegisterError.USERNAME_NOT_AVAILABLE || error == RegisterError.EMAIL_ALREADY_USED)
-                    resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                else
-                    resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
                 resp.getWriter().println(error.getMessage());
                 return;
             }
