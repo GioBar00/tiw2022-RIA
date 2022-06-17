@@ -466,11 +466,12 @@
          * Reset the droppable elements and the notDroppable element.
          */
         this.resetDroppable = function () {
-            for (const elem of document.getElementsByClassName("not-droppable")) {
+            let elements = Array.from(document.getElementsByClassName("not-droppable"));
+            for (const elem of elements) {
                 elem.classList.remove("not-droppable");
             }
 
-            let elements = Array.from(document.getElementsByClassName("droppable"));
+            elements = Array.from(document.getElementsByClassName("droppable"));
             for (const element of elements) {
                 element.classList.remove("droppable");
             }
