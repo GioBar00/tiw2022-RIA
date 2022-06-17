@@ -329,12 +329,13 @@
             element.addEventListener("dragstart", function (e) {
                 e.target.classList.add("dragging");
                 self.startElement = e.target;
-                self.findNotDroppable(e.target);
-                self.notDroppable.classList.add("not-droppable");
-                let subFolders = document.getElementsByClassName("subfolder");
-                for (let subFolder of subFolders) {
-                    if (subFolder.getAttribute("subfolderId") !== self.notDroppable.getAttribute("subfolderId")) {
-                        subFolder.classList.add("droppable");
+                if (self.findNotDroppable(e.target)) {
+                    self.notDroppable.classList.add("not-droppable");
+                    let subFolders = document.getElementsByClassName("subfolder");
+                    for (let subFolder of subFolders) {
+                        if (subFolder.getAttribute("subfolderId") !== self.notDroppable.getAttribute("subfolderId")) {
+                            subFolder.classList.add("droppable");
+                        }
                     }
                 }
                 let trashCan = document.getElementById("trashCan");
@@ -414,14 +415,14 @@
          */
         this.findNotDroppable = function (startElement) {
             let elements = document.getElementsByClassName("subfolder");
-            let find = false;
 
             for (const element of elements) {
                 if (element.getAttribute("subfolderId") === startElement.getAttribute("subfolderId")) {
                     self.notDroppable = element;
-                    find = true;
+                    return true;
                 }
             }
+            return false;
         }
 
         /**
@@ -469,7 +470,7 @@
                 elem.classList.remove("not-droppable");
             }
 
-            let elements = document.getElementsByClassName("droppable");
+            let elements = Array.from(document.getElementsByClassName("droppable"));
             for (const element of elements) {
                 element.classList.remove("droppable");
             }
